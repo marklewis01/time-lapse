@@ -1,17 +1,19 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "./index",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "publish": "expo publish --non-interactive"
   },
   "dependencies": {
     "expo": "~37.0.3",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
+    "react-native-paper": "^3.8.0",
     "react-native-screens": "~2.2.0",
     "react-native-web": "~0.11.7"
   },
