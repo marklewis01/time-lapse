@@ -1,6 +1,6 @@
 import * as React from "react";
 import { registerRootComponent } from "expo";
-import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
+import { DefaultTheme } from "react-native-paper";
 
 import App from "./App";
 
@@ -14,11 +14,7 @@ const theme = {
 };
 
 export default function Main() {
-  return (
-    <PaperProvider theme={theme}>
-      <App />
-    </PaperProvider>
-  );
+  return <App />;
 }
 
 registerRootComponent(Main);
