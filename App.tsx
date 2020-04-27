@@ -1,34 +1,28 @@
 import React from "react";
-import {
-  AsyncStorage,
-  I18nManager,
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import { AsyncStorage, I18nManager, Platform } from "react-native";
 import { Updates } from "expo";
 import {
   DarkTheme,
   DefaultTheme,
   Provider as PaperProvider,
   Theme,
-  Avatar,
-  Button,
-  Card,
-  Title,
-  Paragraph
+  Colors
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
+// Custom comps
+import HomeScreen from "./screens/HomeScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
 
+// Local Storage Settings
 const PERSISTENCE_KEY = "NAVIGATION_STATE";
 const PREFERENCES_KEY = "APP_PREFERENCES";
 
+// Context
 const PreferencesContext = React.createContext<any>(null);
 
+// Drawer
 const DrawerContent = () => {
   return (
     <PreferencesContext.Consumer>
@@ -37,22 +31,40 @@ const DrawerContent = () => {
           toggleTheme={preferences.toggleTheme}
           toggleRTL={preferences.toggleRtl}
           isRTL={preferences.rtl}
-          isDarkTheme={preferences.theme === DarkTheme}
+          isDarkTheme={preferences.theme === customDarkTheme}
         />
       )}
     </PreferencesContext.Consumer>
   );
 };
-
 const Drawer = createDrawerNavigator<{ Home: undefined }>();
 
+const customDefaultTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Colors.green700,
+    accent: Colors.lime600
+  }
+};
+
+const customDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.green900,
+    accent: Colors.lime800
+  }
+};
+
+// App
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
   const [initialState, setInitialState] = React.useState<
     InitialState | undefined
   >();
 
-  const [theme, setTheme] = React.useState<Theme>(DefaultTheme);
+  const [theme, setTheme] = React.useState<Theme>(customDefaultTheme);
   const [rtl, setRtl] = React.useState<boolean>(I18nManager.isRTL);
 
   React.useEffect(() => {
@@ -82,7 +94,9 @@ export default function App() {
 
         if (preferences) {
           // eslint-disable-next-line react/no-did-mount-set-state
-          setTheme(preferences.theme === "dark" ? DarkTheme : DefaultTheme);
+          setTheme(
+            preferences.theme === "dark" ? customDarkTheme : customDefaultTheme
+          );
 
           if (typeof preferences.rtl === "boolean") {
             setRtl(preferences.rtl);
@@ -102,7 +116,7 @@ export default function App() {
         await AsyncStorage.setItem(
           PREFERENCES_KEY,
           JSON.stringify({
-            theme: theme === DarkTheme ? "dark" : "light",
+            theme: theme === customDarkTheme ? "dark" : "light",
             rtl
           })
         );
@@ -123,7 +137,7 @@ export default function App() {
     () => ({
       toggleTheme: () =>
         setTheme((theme) =>
-          theme === DefaultTheme ? DarkTheme : DefaultTheme
+          theme === customDefaultTheme ? customDarkTheme : customDefaultTheme
         ),
       toggleRtl: () => setRtl((rtl) => !rtl),
       rtl,
@@ -139,46 +153,21 @@ export default function App() {
   return (
     <PaperProvider theme={theme}>
       <PreferencesContext.Provider value={preferences}>
-        <React.Fragment>
-          <NavigationContainer
-            initialState={initialState}
-            onStateChange={(state) =>
-              AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
-            }
-          >
-            {Platform.OS === "web" ? (
-              <Test />
-            ) : (
-              <Drawer.Navigator drawerContent={() => <DrawerContent />}>
-                <Drawer.Screen name="Home" component={Test} />
-              </Drawer.Navigator>
-            )}
-          </NavigationContainer>
-        </React.Fragment>
+        <NavigationContainer
+          initialState={initialState}
+          onStateChange={(state) =>
+            AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
+          }
+        >
+          {Platform.OS === "web" ? (
+            <HomeScreen />
+          ) : (
+            <Drawer.Navigator drawerContent={() => <DrawerContent />}>
+              <Drawer.Screen name="Home" component={HomeScreen} />
+            </Drawer.Navigator>
+          )}
+        </NavigationContainer>
       </PreferencesContext.Provider>
     </PaperProvider>
   );
 }
-
-const LeftContent = (props: any) => <Avatar.Icon {...props} icon="folder" />;
-
-const Test = () => (
-  <View>
-    <Card>
-      <Card.Title
-        title="Card Title"
-        subtitle="Card Subtitle"
-        left={LeftContent}
-      />
-      <Card.Content>
-        <Title>Card title</Title>
-        <Paragraph>Card content</Paragraph>
-      </Card.Content>
-      <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
-      <Card.Actions>
-        <Button>Cancel</Button>
-        <Button>Ok</Button>
-      </Card.Actions>
-    </Card>
-  </View>
-);

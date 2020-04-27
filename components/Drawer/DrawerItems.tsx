@@ -6,7 +6,8 @@ import {
   TouchableRipple,
   Text,
   Colors,
-  useTheme
+  useTheme,
+  Button
 } from "react-native-paper";
 
 type Props = {
@@ -58,15 +59,26 @@ const DrawerItems = ({ toggleTheme, toggleRTL, isRTL, isDarkTheme }: Props) => {
             </View>
           </View>
         </TouchableRipple>
-        <TouchableRipple onPress={toggleRTL}>
-          <View style={styles.preference}>
-            <Text>RTL</Text>
-            <View pointerEvents="none">
-              <Switch value={isRTL} />
-            </View>
+        {/* <TouchableRipple onPress={toggleRTL}> */}
+        <View style={styles.preference}>
+          <Text>RTL</Text>
+          <View pointerEvents="none">
+            <Switch value={isRTL} />
           </View>
-        </TouchableRipple>
+        </View>
+        {/* </TouchableRipple> */}
       </Drawer.Section>
+
+      <View style={styles.logoutSection}>
+        <Button
+          mode="contained"
+          icon="logout"
+          style={styles.logoutButton}
+          onPress={() => console.log("logout pressed")}
+        >
+          Logout
+        </Button>
+      </View>
     </View>
   );
 };
@@ -81,6 +93,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 12,
     paddingHorizontal: 16
+  },
+  logoutButton: {
+    borderRadius: 0,
+    padding: 10
+  },
+  logoutSection: {
+    flex: 1,
+    justifyContent: "flex-end"
   }
 });
 
