@@ -1,5 +1,5 @@
 import React from "react";
-import { AsyncStorage, I18nManager, Platform } from "react-native";
+import { AsyncStorage, I18nManager } from "react-native";
 import { Updates } from "expo";
 import {
   DarkTheme,
@@ -9,10 +9,12 @@ import {
   Colors
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
+import CameraScreen from "./screens/CameraScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
 
 // Local Storage Settings
@@ -22,6 +24,7 @@ const PREFERENCES_KEY = "APP_PREFERENCES";
 // Context
 const PreferencesContext = React.createContext<any>(null);
 
+const Stack = createStackNavigator();
 // Drawer
 const DrawerContent = () => {
   return (
@@ -52,8 +55,8 @@ const customDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: Colors.green900,
-    accent: Colors.lime800
+    primary: Colors.green400,
+    accent: Colors.lime900
   }
 };
 
@@ -159,13 +162,9 @@ export default function App() {
             AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
           }
         >
-          {Platform.OS === "web" ? (
-            <HomeScreen />
-          ) : (
-            <Drawer.Navigator drawerContent={() => <DrawerContent />}>
-              <Drawer.Screen name="Home" component={HomeScreen} />
-            </Drawer.Navigator>
-          )}
+          <Drawer.Navigator drawerContent={() => <DrawerContent />}>
+            <Drawer.Screen name="Home" component={HomeScreen} />
+          </Drawer.Navigator>
         </NavigationContainer>
       </PreferencesContext.Provider>
     </PaperProvider>
