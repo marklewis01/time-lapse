@@ -53,5 +53,11 @@ export const styles = StyleSheet.create({
   galleryImage: {
     width: 75,
     height: 75
+  },
+  topToolbar: {
+    width: winWidth,
+    position: "absolute",
+    height: 100,
+    top: 0
   }
 });

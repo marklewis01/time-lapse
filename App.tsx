@@ -74,6 +74,7 @@ export default function App() {
     const restoreState = async () => {
       try {
         const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
+
         const state = JSON.parse(savedStateString || "");
 
         setInitialState(state);

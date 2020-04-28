@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Camera } from "expo-camera";
+
 import { Ionicons } from "@expo/vector-icons";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import { View, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
@@ -21,7 +22,7 @@ interface Props {
   onShortCapture?: any;
 }
 
-export default ({
+export const TopToolbar = ({
   capturing = false,
   // cameraType = CameraTypes.back,
   flashMode = CameraFlashModes.off,
@@ -32,26 +33,35 @@ export default ({
   // onLongCapture,
   onShortCapture
 }: Props) => (
-  <Grid style={styles.bottomToolbar}>
+  <Grid style={styles.topToolbar}>
     <Row>
       <Col style={styles.alignCenter}>
-        {/* <TouchableOpacity
-          onPress={() =>
-            setFlashMode(
-              flashMode === CameraFlashModes.on
-                ? CameraFlashModes.off
-                : CameraFlashModes.on
-            )
-          }
-        > */}
+        <Ionicons name="md-reverse-camera" color="white" size={30} />
+      </Col>
+      <Col style={styles.alignCenter}>
         <Ionicons
           name={flashMode == CameraFlashModes.on ? "md-flash" : "md-flash-off"}
           color="white"
           size={30}
         />
-        {/* </TouchableOpacity> */}
       </Col>
-      <Col size={2} style={styles.alignCenter}>
+    </Row>
+  </Grid>
+);
+
+export const BottomToolbar = ({
+  capturing = false,
+  handleOverlay,
+  onShortCapture
+}: {
+  capturing: boolean | null;
+  handleOverlay: () => Promise<void>;
+  onShortCapture: () => Promise<void>;
+}) => (
+  <Grid style={styles.bottomToolbar}>
+    <Row style={{ alignItems: "center" }}>
+      <Col />
+      <Col style={styles.alignCenter}>
         <TouchableWithoutFeedback
           // onPressIn={onCaptureIn}
           // onPressOut={onCaptureOut}
@@ -65,18 +75,10 @@ export default ({
           </View>
         </TouchableWithoutFeedback>
       </Col>
-      <Col style={styles.alignCenter}>
-        {/* <TouchableOpacity
-          onPress={() =>
-            setCameraType(
-              cameraType === CameraTypes.back
-                ? CameraTypes.front
-                : CameraTypes.back
-            )
-          }
-        > */}
-        <Ionicons name="md-reverse-camera" color="white" size={30} />
-        {/* </TouchableOpacity> */}
+      <Col>
+        <TouchableOpacity onPress={handleOverlay}>
+          <Ionicons name="ios-image" color="white" size={30} />
+        </TouchableOpacity>
       </Col>
     </Row>
   </Grid>
