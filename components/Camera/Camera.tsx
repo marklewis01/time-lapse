@@ -27,7 +27,6 @@ import { styles } from "./styles";
 export default () => {
   const camera = React.createRef();
 
-  const [screenActive, setScreenActive] = React.useState(false);
   const [cameraPermission, setCameraPermission] = React.useState<boolean>();
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean
@@ -68,8 +67,6 @@ export default () => {
       setCameraRollPermission(mediaStatus === "granted");
     })();
 
-    setScreenActive(true);
-
     return () => {
       console.log("un-mounting");
     };
@@ -85,7 +82,7 @@ export default () => {
     );
   }
 
-  return screenActive ? (
+  return (
     <React.Fragment>
       <View>
         <Camera
@@ -110,7 +107,5 @@ export default () => {
         onShortCapture={handleTakePhoto}
       />
     </React.Fragment>
-  ) : (
-    <Text>Loading</Text>
   );
 };
