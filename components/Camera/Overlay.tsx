@@ -9,46 +9,25 @@ import {
   TouchableOpacity
 } from "react-native";
 
-export const Overlay = ({ image }: { image: any }) => {
+// Comps
+import OpacitySlider from "./OpacitySlider";
+
+export const Overlay = () => {
   const [type, setType] = React.useState(Camera.Constants.Type.back);
 
   const { height, width } = Dimensions.get("window");
   // const maskRowHeight = Math.round((AppStore.height - 300) / 20);
   const maskColWidth = (width - 300) / 2;
+
   return (
-    <ImageBackground
-      source={image}
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        opacity: 0.25
-      }}
-      imageStyle={{
-        resizeMode: "contain"
-      }}
-    >
-      <View style={styles.maskOutter}>
-        <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
-        <View style={[{ flex: 30 }, styles.maskCenter]}>
-          <TouchableOpacity
-            style={{ flex: 1, alignItems: "center" }}
-            onPress={() => {
-              console.log("clicked");
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              );
-            }}
-          >
-            <View style={[{ width: maskColWidth }, styles.maskFrame]} />
-            <View style={styles.maskInner} />
-            <View style={[{ width: maskColWidth }, styles.maskFrame]} />
-          </TouchableOpacity>
-        </View>
-        <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
-      </View>
-    </ImageBackground>
+    <View style={styles.maskOutter}>
+      <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
+      <View style={[{ flex: 30 }, styles.maskCenter]} />
+
+      <OpacitySlider />
+
+      <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
+    </View>
   );
 };
 

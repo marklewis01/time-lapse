@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, ImageBackground, Text, View } from "react-native";
+import { ImageBackground, Text, View } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
@@ -7,12 +7,14 @@ import { DeviceMotion } from "expo-sensors";
 
 // Comps
 import { BottomToolbar, TopToolbar } from "./Toolbar";
+import { Overlay } from "./Overlay";
 
 // styles
 import { styles } from "./styles";
 
 // Types
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+import { orientation } from "../../types";
 
 /*
  * ============================
@@ -30,9 +32,9 @@ export default () => {
   const [flashMode, setFlashMode] = React.useState<
     typeof Camera.Constants.FlashMode
   >(Camera.Constants.FlashMode.auto);
-  const [orientation, setOrientation] = React.useState<
-    "landscape" | "portrait"
-  >("portrait");
+  const [orientation, setOrientation] = React.useState<orientation>(
+    "portrait-up"
+  );
   const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
 
   const handleCameraType = () => {
@@ -105,6 +107,8 @@ export default () => {
     }
   };
 
+  const hasDeviceMotion = async () => DeviceMotion.isAvailableAsync();
+
   React.useEffect(() => {
     // Check / Obtain permissions on mount
     (async () => {
@@ -120,13 +124,23 @@ export default () => {
   }, []);
 
   React.useEffect(() => {
-    // handle orientation - to rotate icons
-    DeviceMotion.addListener(({ rotation }) => {
-      const alpha = Math.abs(rotation.alpha);
-      setOrientation(
-        alpha > 3 || (alpha > 0 && alpha < 0.5) ? "landscape" : "portrait"
-      );
-    });
+    // subscribe to device motion - used to rotate icons
+
+    if (hasDeviceMotion()) {
+      DeviceMotion.addListener(({ rotation }) => {
+        setOrientation(
+          rotation.beta > 0.75
+            ? "portrait-up"
+            : rotation.beta < -0.75
+            ? "portrait-down"
+            : rotation.gamma > 0
+            ? "landscape-right"
+            : "landscape-left"
+        );
+      });
+
+      DeviceMotion.setUpdateInterval(1000);
+    }
 
     return () => DeviceMotion.removeAllListeners();
   }, []);
@@ -139,26 +153,25 @@ export default () => {
 
   return (
     <React.Fragment>
-      <View>
-        <Camera
-          type={cameraType}
-          flashMode={flashMode}
-          style={styles.preview}
-          ref={(ref) => (camera.current = ref)}
-          ratio={"16:9"}
-        ></Camera>
-        {overlay && (
-          <ImageBackground
-            source={{ uri: overlay.uri }}
-            style={[
-              styles.preview,
-              {
-                opacity: 0.25
-              }
-            ]}
-          />
-        )}
-      </View>
+      <Camera
+        type={cameraType}
+        flashMode={flashMode}
+        style={styles.preview}
+        ref={(ref) => (camera.current = ref)}
+        ratio={"16:9"}
+      ></Camera>
+      {overlay && (
+        <ImageBackground
+          source={{ uri: overlay.uri }}
+          style={[
+            styles.preview,
+            {
+              opacity: 0.25
+            }
+          ]}
+        />
+      )}
+      <Overlay />
       <TopToolbar
         flashMode={flashMode}
         setFlashMode={handleFlashMode}

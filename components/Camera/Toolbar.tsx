@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import { Col, Row, Grid } from "react-native-easy-grid";
-
 import { Camera } from "expo-camera";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
@@ -16,13 +15,14 @@ import { styles } from "./styles";
 
 // Types
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+import { orientation } from "../../types";
 
 const { FlashMode: CameraFlashModes, Type: CameraTypes } = Camera.Constants;
 
 interface Props {
   cameraType: typeof CameraTypes;
   flashMode: typeof CameraFlashModes;
-  orientation: "landscape" | "portrait";
+  orientation: orientation;
   setFlashMode(): void;
   setCameraType(): void;
 }
@@ -46,7 +46,13 @@ export const TopToolbar = ({
               size={25}
               style={{
                 transform: [
-                  { rotate: orientation === "landscape" ? "90deg" : "0deg" },
+                  {
+                    rotate: orientation.startsWith("portrait")
+                      ? "0deg"
+                      : orientation === "landscape-left"
+                      ? "90deg"
+                      : "-90deg"
+                  },
                   { perspective: 1000 }
                 ]
               }}
@@ -72,7 +78,11 @@ export const TopToolbar = ({
                 style={{
                   transform: [
                     {
-                      rotate: orientation === "landscape" ? "90deg" : "0deg"
+                      rotate: orientation.startsWith("portrait")
+                        ? "0deg"
+                        : orientation === "landscape-left"
+                        ? "90deg"
+                        : "-90deg"
                     },
                     { perspective: 1000 }
                   ]
@@ -98,7 +108,7 @@ export const BottomToolbar = ({
   handleOverlay: () => Promise<void>;
   handleClearOverlay: () => void;
   onShortCapture: () => Promise<void>;
-  orientation: "landscape" | "portrait";
+  orientation: orientation;
   overlay: ImageInfo | null;
 }) => (
   <Grid style={styles.bottomToolbar}>
@@ -117,12 +127,17 @@ export const BottomToolbar = ({
         <View
           style={{
             position: "relative",
-            flexDirection:
-              orientation === "portrait" ? "row" : "column-reverse",
+            flexDirection: orientation.startsWith("portrait")
+              ? "row"
+              : "column-reverse",
             alignItems: "center",
             transform: [
               {
-                rotate: orientation === "landscape" ? "90deg" : "0deg"
+                rotate: orientation.startsWith("portrait")
+                  ? "0deg"
+                  : orientation === "landscape-left"
+                  ? "90deg"
+                  : "-90deg"
               },
               { perspective: 1000 }
             ]
