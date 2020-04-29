@@ -26,15 +26,28 @@ import { Overlay } from "./Overlay";
 // styles
 import { styles } from "./styles";
 
+const { width: winWidth, height: winHeight } = Dimensions.get("window");
+
+// Types
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+
+// Constants
 const projectDirectory = FileSystem.documentDirectory + "Camera/";
 
+/*
+ * ============================
+ *  Exported Camera Component
+ * ============================
+ */
 export default () => {
   const camera = React.createRef<Camera | null>();
 
   const [cameraPermission, setCameraPermission] = React.useState<boolean>();
-
   const [capturing, setCapturing] = React.useState(false);
-  const [overlay, setOverlay] = React.useState<string | null>(null);
+  const [flashMode, setFlashMode] = React.useState<
+    typeof Camera.Constants.FlashMode
+  >(Camera.Constants.FlashMode.auto);
+  const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
 
   const handleTakePhoto = async () => {
     if (camera.current instanceof Camera) {
@@ -74,11 +87,28 @@ export default () => {
     // on click, if selected, set state
     const result = await ImagePicker.launchImageLibraryAsync();
 
+    console.log({ result });
     if (!result.cancelled) {
-      setOverlay(result.uri);
+      // get size of overlay image, update camera aspect if required
+
+      setOverlay(result);
     }
+
     // resume camera
     camera.current?.resumePreview();
+  };
+
+  const handleClearOverlay = () => setOverlay(null);
+
+  const handleFlashMode = () => {
+    // cycles through flash modes: auto > flash > none
+    setFlashMode((prevState: typeof Camera.Constants.FlashMode) =>
+      prevState === Camera.Constants.FlashMode.auto
+        ? Camera.Constants.FlashMode.on
+        : prevState === Camera.Constants.FlashMode.on
+        ? Camera.Constants.FlashMode.off
+        : Camera.Constants.FlashMode.auto
+    );
   };
 
   React.useEffect(() => {
@@ -101,48 +131,44 @@ export default () => {
     return <Text>Access to camera has been denied.</Text>;
   }
 
-  console.log({ overlay });
+  console.log({ flashMode });
   return (
     <React.Fragment>
       <View>
         <Camera
           type={Camera.Constants.Type.back}
-          flashMode={Camera.Constants.FlashMode.off}
+          flashMode={flashMode}
           style={styles.preview}
           ref={(ref) => (camera.current = ref)}
-        >
-          {overlay && (
-            <ImageBackground
-              source={{ uri: overlay }}
-              style={{
-                flex: 1,
-                justifyContent: "center",
+          ratio={"16:9"}
+        ></Camera>
+        {overlay && (
+          <ImageBackground
+            source={{ uri: overlay.uri }}
+            style={[
+              styles.preview,
+              {
                 opacity: 0.25
-              }}
-              imageStyle={{
-                resizeMode: "contain"
-              }}
-            />
-          )}
-        </Camera>
+              }
+            ]}
+          />
+        )}
       </View>
       <TopToolbar
         capturing={capturing}
-        // flashMode={flashMode}
+        flashMode={flashMode}
+        setFlashMode={handleFlashMode}
         // cameraType={cameraType}
-        // setFlashMode={this.setFlashMode}
         // setCameraType={this.setCameraType}
-        // onCaptureIn={this.handleCaptureIn}
-        // onCaptureOut={this.handleCaptureOut}
-        // onLongCapture={this.handleLongCapture}
         onShortCapture={handleTakePhoto}
       />
-      {/* {captures.length > 0 && <Gallery captures={captures} />} */}
 
       <BottomToolbar
         capturing={capturing}
         handleOverlay={handleSelectOverlay}
+        handleClearOverlay={handleClearOverlay}
         onShortCapture={handleTakePhoto}
+        overlay={overlay}
       />
     </React.Fragment>
   );
