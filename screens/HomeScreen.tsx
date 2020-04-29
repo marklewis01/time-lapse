@@ -76,16 +76,6 @@ const Home = ({ navigation }: any) => {
     }
   }, [cameraRollPermission]);
 
-  // React.useEffect(() => {
-  //   console.log("adding listener");
-
-  //   MediaLibrary.addListener(() => {
-  //     console.log("file");
-  //   });
-
-  //   return () => MediaLibrary.removeAllListeners();
-  // }, []);
-
   return cameraRollPermission === undefined ? (
     <View />
   ) : cameraRollPermission === false ? (

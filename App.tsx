@@ -9,12 +9,10 @@ import {
   Colors
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
-import CameraScreen from "./screens/CameraScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
 
 // Local Storage Settings
@@ -24,7 +22,6 @@ const PREFERENCES_KEY = "APP_PREFERENCES";
 // Context
 const PreferencesContext = React.createContext<any>(null);
 
-const Stack = createStackNavigator();
 // Drawer
 const DrawerContent = () => {
   return (

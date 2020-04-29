@@ -1,38 +1,18 @@
 import React from "react";
-import {
-  Dimensions,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity
-} from "react-native";
+import { Dimensions, ImageBackground, Text, View } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
-import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-
-import {
-  FontAwesome,
-  Ionicons,
-  MaterialCommunityIcons
-} from "@expo/vector-icons";
+import { DeviceMotion } from "expo-sensors";
 
 // Comps
 import { BottomToolbar, TopToolbar } from "./Toolbar";
-import Gallery from "./Gallery";
-import { Overlay } from "./Overlay";
 
 // styles
 import { styles } from "./styles";
 
-const { width: winWidth, height: winHeight } = Dimensions.get("window");
-
 // Types
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
-
-// Constants
-const projectDirectory = FileSystem.documentDirectory + "Camera/";
 
 /*
  * ============================
@@ -50,6 +30,9 @@ export default () => {
   const [flashMode, setFlashMode] = React.useState<
     typeof Camera.Constants.FlashMode
   >(Camera.Constants.FlashMode.auto);
+  const [orientation, setOrientation] = React.useState<
+    "landscape" | "portrait"
+  >("portrait");
   const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
 
   const handleCameraType = () => {
@@ -136,13 +119,24 @@ export default () => {
     })();
   }, []);
 
+  React.useEffect(() => {
+    // handle orientation - to rotate icons
+    DeviceMotion.addListener(({ rotation }) => {
+      const alpha = Math.abs(rotation.alpha);
+      setOrientation(
+        alpha > 3 || (alpha > 0 && alpha < 0.5) ? "landscape" : "portrait"
+      );
+    });
+
+    return () => DeviceMotion.removeAllListeners();
+  }, []);
+
   if (cameraPermission === undefined) {
     return <View />;
   } else if (cameraPermission === false) {
     return <Text>Access to camera has been denied.</Text>;
   }
 
-  // console.log({ cameraType });
   return (
     <React.Fragment>
       <View>
@@ -170,6 +164,7 @@ export default () => {
         setFlashMode={handleFlashMode}
         cameraType={cameraType}
         setCameraType={handleCameraType}
+        orientation={orientation}
       />
 
       <BottomToolbar
@@ -178,6 +173,7 @@ export default () => {
         handleClearOverlay={handleClearOverlay}
         onShortCapture={handleTakePhoto}
         overlay={overlay}
+        orientation={orientation}
       />
     </React.Fragment>
   );

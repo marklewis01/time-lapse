@@ -27,7 +27,9 @@
     "react-native-screens": "~2.2.0",
     "react-native-web": "~0.11.7",
     "expo-file-system": "~8.1.0",
-    "expo-image-picker": "~8.1.0"
+    "expo-image-picker": "~8.1.0",
+    "expo-screen-orientation": "~1.0.0",
+    "expo-sensors": "~8.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

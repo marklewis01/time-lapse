@@ -9,7 +9,7 @@ import { IconButton } from "react-native-paper";
 import { Col, Row, Grid } from "react-native-easy-grid";
 
 import { Camera } from "expo-camera";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 // Styles
 import { styles } from "./styles";
@@ -22,6 +22,7 @@ const { FlashMode: CameraFlashModes, Type: CameraTypes } = Camera.Constants;
 interface Props {
   cameraType: typeof CameraTypes;
   flashMode: typeof CameraFlashModes;
+  orientation: "landscape" | "portrait";
   setFlashMode(): void;
   setCameraType(): void;
 }
@@ -29,6 +30,7 @@ interface Props {
 export const TopToolbar = ({
   cameraType,
   flashMode,
+  orientation,
   setFlashMode,
   setCameraType
 }: Props) => (
@@ -38,7 +40,17 @@ export const TopToolbar = ({
         <IconButton
           onPress={setCameraType}
           icon={() => (
-            <Ionicons name="md-reverse-camera" color="white" size={25} />
+            <Ionicons
+              name="md-reverse-camera"
+              color="white"
+              size={25}
+              style={{
+                transform: [
+                  { rotate: orientation === "landscape" ? "90deg" : "0deg" },
+                  { perspective: 1000 }
+                ]
+              }}
+            />
           )}
         />
       </Col>
@@ -46,15 +58,27 @@ export const TopToolbar = ({
         {cameraType === Camera.Constants.Type.back ? (
           <IconButton
             onPress={setFlashMode}
-            icon={
-              flashMode === Camera.Constants.FlashMode.on
-                ? "flash"
-                : flashMode === Camera.Constants.FlashMode.auto
-                ? "flash-auto"
-                : "flash-off"
-            }
-            size={25}
-            color="white"
+            icon={() => (
+              <MaterialIcons
+                name={
+                  flashMode === Camera.Constants.FlashMode.on
+                    ? "flash-on"
+                    : flashMode === Camera.Constants.FlashMode.auto
+                    ? "flash-auto"
+                    : "flash-off"
+                }
+                color="white"
+                size={25}
+                style={{
+                  transform: [
+                    {
+                      rotate: orientation === "landscape" ? "90deg" : "0deg"
+                    },
+                    { perspective: 1000 }
+                  ]
+                }}
+              />
+            )}
           />
         ) : null}
       </Col>
@@ -67,24 +91,21 @@ export const BottomToolbar = ({
   handleOverlay,
   handleClearOverlay,
   onShortCapture,
+  orientation,
   overlay
 }: {
   capturing: boolean | null;
   handleOverlay: () => Promise<void>;
   handleClearOverlay: () => void;
   onShortCapture: () => Promise<void>;
+  orientation: "landscape" | "portrait";
   overlay: ImageInfo | null;
 }) => (
   <Grid style={styles.bottomToolbar}>
     <Row style={{ alignItems: "center" }}>
       <Col />
       <Col style={styles.alignCenter}>
-        <TouchableWithoutFeedback
-          // onPressIn={onCaptureIn}
-          // onPressOut={onCaptureOut}
-          // onLongPress={onLongCapture}
-          onPress={onShortCapture}
-        >
+        <TouchableWithoutFeedback onPress={onShortCapture}>
           <View
             style={[styles.captureBtn, capturing && styles.captureBtnActive]}
           >
@@ -96,8 +117,15 @@ export const BottomToolbar = ({
         <View
           style={{
             position: "relative",
-            flexDirection: "row",
-            alignItems: "flex-start"
+            flexDirection:
+              orientation === "portrait" ? "row" : "column-reverse",
+            alignItems: "center",
+            transform: [
+              {
+                rotate: orientation === "landscape" ? "90deg" : "0deg"
+              },
+              { perspective: 1000 }
+            ]
           }}
         >
           <TouchableOpacity onPress={handleOverlay}>
@@ -108,14 +136,16 @@ export const BottomToolbar = ({
                   width: 60,
                   height: 60
                 }}
-                imageStyle={{ borderRadius: 30 }}
+                imageStyle={{
+                  borderRadius: 30
+                }}
               />
             ) : (
               <Ionicons name="ios-image" color="white" size={50} />
             )}
           </TouchableOpacity>
           {overlay ? (
-            <View style={{ marginLeft: 10 }}>
+            <View style={{ padding: 5 }}>
               <TouchableOpacity onPress={handleClearOverlay}>
                 <Ionicons name="ios-remove-circle" color="red" size={30} />
               </TouchableOpacity>

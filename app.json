@@ -16,6 +16,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "requireFullScreen": true,
       "supportsTablet": true
     }
   }
