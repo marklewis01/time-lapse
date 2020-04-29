@@ -142,7 +142,7 @@ export default () => {
     return <Text>Access to camera has been denied.</Text>;
   }
 
-  console.log({ cameraType });
+  // console.log({ cameraType });
   return (
     <React.Fragment>
       <View>
