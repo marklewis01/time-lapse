@@ -20,43 +20,43 @@ import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 const { FlashMode: CameraFlashModes, Type: CameraTypes } = Camera.Constants;
 
 interface Props {
-  capturing?: boolean | null;
-  cameraType?: any;
-  flashMode?: typeof CameraFlashModes;
-  setFlashMode?: any;
-  setCameraType?: any;
-  onCaptureIn?: any;
-  onCaptureOut?: any;
-  onLongCapture?: any;
-  onShortCapture?: any;
+  cameraType: typeof CameraTypes;
+  flashMode: typeof CameraFlashModes;
+  setFlashMode(): void;
+  setCameraType(): void;
 }
 
 export const TopToolbar = ({
-  capturing = false,
-  // cameraType = CameraTypes.back,
+  cameraType,
   flashMode,
   setFlashMode,
-  // setCameraType,
-  onShortCapture
+  setCameraType
 }: Props) => (
   <Grid style={styles.topToolbar}>
     <Row>
       <Col style={styles.alignCenter}>
-        <Ionicons name="md-reverse-camera" color="white" size={30} />
+        <IconButton
+          onPress={setCameraType}
+          icon={() => (
+            <Ionicons name="md-reverse-camera" color="white" size={25} />
+          )}
+        />
       </Col>
       <Col style={styles.alignCenter}>
-        <IconButton
-          onPress={setFlashMode}
-          icon={
-            flashMode === Camera.Constants.FlashMode.on
-              ? "flash"
-              : flashMode === Camera.Constants.FlashMode.auto
-              ? "flash-auto"
-              : "flash-off"
-          }
-          size={20}
-          color="white"
-        />
+        {cameraType === Camera.Constants.Type.back ? (
+          <IconButton
+            onPress={setFlashMode}
+            icon={
+              flashMode === Camera.Constants.FlashMode.on
+                ? "flash"
+                : flashMode === Camera.Constants.FlashMode.auto
+                ? "flash-auto"
+                : "flash-off"
+            }
+            size={25}
+            color="white"
+          />
+        ) : null}
       </Col>
     </Row>
   </Grid>

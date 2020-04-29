@@ -43,33 +43,34 @@ export default () => {
   const camera = React.createRef<Camera | null>();
 
   const [cameraPermission, setCameraPermission] = React.useState<boolean>();
+  const [cameraType, setCameraType] = React.useState<
+    typeof Camera.Constants.Type
+  >(Camera.Constants.Type.back);
   const [capturing, setCapturing] = React.useState(false);
   const [flashMode, setFlashMode] = React.useState<
     typeof Camera.Constants.FlashMode
   >(Camera.Constants.FlashMode.auto);
   const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
 
-  const handleTakePhoto = async () => {
-    if (camera.current instanceof Camera) {
-      try {
-        setCapturing(true);
-        const { uri } = await camera.current.takePictureAsync();
-        setCapturing(false);
+  const handleCameraType = () => {
+    setCameraType((prevState: typeof Camera.Constants.Type) =>
+      prevState === Camera.Constants.Type.back
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+    );
+  };
 
-        // // save to filesystem
-        // await FileSystem.copyAsync({
-        //   from: image.uri,
-        //   to: projectDirectory! + "first_project/test.jpg"
-        // });
+  const handleClearOverlay = () => setOverlay(null);
 
-        // save to device media library
-        const asset = await MediaLibrary.createAssetAsync(uri);
-
-        await MediaLibrary.createAlbumAsync("aa_TimeShift", asset, false);
-      } catch (error) {
-        console.log("err", error);
-      }
-    }
+  const handleFlashMode = () => {
+    // cycles through flash modes: auto > flash > none
+    setFlashMode((prevState: typeof Camera.Constants.FlashMode) =>
+      prevState === Camera.Constants.FlashMode.auto
+        ? Camera.Constants.FlashMode.on
+        : prevState === Camera.Constants.FlashMode.on
+        ? Camera.Constants.FlashMode.off
+        : Camera.Constants.FlashMode.auto
+    );
   };
 
   const handleSelectOverlay = async () => {
@@ -98,17 +99,27 @@ export default () => {
     camera.current?.resumePreview();
   };
 
-  const handleClearOverlay = () => setOverlay(null);
+  const handleTakePhoto = async () => {
+    if (camera.current instanceof Camera) {
+      try {
+        setCapturing(true);
+        const { uri } = await camera.current.takePictureAsync();
+        setCapturing(false);
 
-  const handleFlashMode = () => {
-    // cycles through flash modes: auto > flash > none
-    setFlashMode((prevState: typeof Camera.Constants.FlashMode) =>
-      prevState === Camera.Constants.FlashMode.auto
-        ? Camera.Constants.FlashMode.on
-        : prevState === Camera.Constants.FlashMode.on
-        ? Camera.Constants.FlashMode.off
-        : Camera.Constants.FlashMode.auto
-    );
+        // // save to filesystem
+        // await FileSystem.copyAsync({
+        //   from: image.uri,
+        //   to: projectDirectory! + "first_project/test.jpg"
+        // });
+
+        // save to device media library
+        const asset = await MediaLibrary.createAssetAsync(uri);
+
+        await MediaLibrary.createAlbumAsync("aa_TimeShift", asset, false);
+      } catch (error) {
+        console.log("err", error);
+      }
+    }
   };
 
   React.useEffect(() => {
@@ -131,12 +142,12 @@ export default () => {
     return <Text>Access to camera has been denied.</Text>;
   }
 
-  console.log({ flashMode });
+  console.log({ cameraType });
   return (
     <React.Fragment>
       <View>
         <Camera
-          type={Camera.Constants.Type.back}
+          type={cameraType}
           flashMode={flashMode}
           style={styles.preview}
           ref={(ref) => (camera.current = ref)}
@@ -155,12 +166,10 @@ export default () => {
         )}
       </View>
       <TopToolbar
-        capturing={capturing}
         flashMode={flashMode}
         setFlashMode={handleFlashMode}
-        // cameraType={cameraType}
-        // setCameraType={this.setCameraType}
-        onShortCapture={handleTakePhoto}
+        cameraType={cameraType}
+        setCameraType={handleCameraType}
       />
 
       <BottomToolbar
