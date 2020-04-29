@@ -1,18 +1,28 @@
 import React from "react";
+import {
+  ImageBackground,
+  View,
+  TouchableWithoutFeedback,
+  TouchableOpacity
+} from "react-native";
+import { IconButton } from "react-native-paper";
+import { Col, Row, Grid } from "react-native-easy-grid";
 
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
-import { Col, Row, Grid } from "react-native-easy-grid";
-import { View, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
 
+// Styles
 import { styles } from "./styles";
+
+// Types
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 
 const { FlashMode: CameraFlashModes, Type: CameraTypes } = Camera.Constants;
 
 interface Props {
   capturing?: boolean | null;
   cameraType?: any;
-  flashMode?: any;
+  flashMode?: typeof CameraFlashModes;
   setFlashMode?: any;
   setCameraType?: any;
   onCaptureIn?: any;
@@ -21,37 +31,54 @@ interface Props {
   onShortCapture?: any;
 }
 
-export default ({
+export const TopToolbar = ({
   capturing = false,
   // cameraType = CameraTypes.back,
-  flashMode = CameraFlashModes.off,
-  // setFlashMode,
+  flashMode,
+  setFlashMode,
   // setCameraType,
-  // onCaptureIn,
-  // onCaptureOut,
-  // onLongCapture,
   onShortCapture
 }: Props) => (
-  <Grid style={styles.bottomToolbar}>
+  <Grid style={styles.topToolbar}>
     <Row>
       <Col style={styles.alignCenter}>
-        {/* <TouchableOpacity
-          onPress={() =>
-            setFlashMode(
-              flashMode === CameraFlashModes.on
-                ? CameraFlashModes.off
-                : CameraFlashModes.on
-            )
-          }
-        > */}
-        <Ionicons
-          name={flashMode == CameraFlashModes.on ? "md-flash" : "md-flash-off"}
-          color="white"
-          size={30}
-        />
-        {/* </TouchableOpacity> */}
+        <Ionicons name="md-reverse-camera" color="white" size={30} />
       </Col>
-      <Col size={2} style={styles.alignCenter}>
+      <Col style={styles.alignCenter}>
+        <IconButton
+          onPress={setFlashMode}
+          icon={
+            flashMode === Camera.Constants.FlashMode.on
+              ? "flash"
+              : flashMode === Camera.Constants.FlashMode.auto
+              ? "flash-auto"
+              : "flash-off"
+          }
+          size={20}
+          color="white"
+        />
+      </Col>
+    </Row>
+  </Grid>
+);
+
+export const BottomToolbar = ({
+  capturing = false,
+  handleOverlay,
+  handleClearOverlay,
+  onShortCapture,
+  overlay
+}: {
+  capturing: boolean | null;
+  handleOverlay: () => Promise<void>;
+  handleClearOverlay: () => void;
+  onShortCapture: () => Promise<void>;
+  overlay: ImageInfo | null;
+}) => (
+  <Grid style={styles.bottomToolbar}>
+    <Row style={{ alignItems: "center" }}>
+      <Col />
+      <Col style={styles.alignCenter}>
         <TouchableWithoutFeedback
           // onPressIn={onCaptureIn}
           // onPressOut={onCaptureOut}
@@ -65,18 +92,36 @@ export default ({
           </View>
         </TouchableWithoutFeedback>
       </Col>
-      <Col style={styles.alignCenter}>
-        {/* <TouchableOpacity
-          onPress={() =>
-            setCameraType(
-              cameraType === CameraTypes.back
-                ? CameraTypes.front
-                : CameraTypes.back
-            )
-          }
-        > */}
-        <Ionicons name="md-reverse-camera" color="white" size={30} />
-        {/* </TouchableOpacity> */}
+      <Col style={{ alignItems: "center", justifyContent: "center" }}>
+        <View
+          style={{
+            position: "relative",
+            flexDirection: "row",
+            alignItems: "flex-start"
+          }}
+        >
+          <TouchableOpacity onPress={handleOverlay}>
+            {overlay ? (
+              <ImageBackground
+                source={{ uri: overlay.uri }}
+                style={{
+                  width: 60,
+                  height: 60
+                }}
+                imageStyle={{ borderRadius: 30 }}
+              />
+            ) : (
+              <Ionicons name="ios-image" color="white" size={50} />
+            )}
+          </TouchableOpacity>
+          {overlay ? (
+            <View style={{ marginLeft: 10 }}>
+              <TouchableOpacity onPress={handleClearOverlay}>
+                <Ionicons name="ios-remove-circle" color="red" size={30} />
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
       </Col>
     </Row>
   </Grid>

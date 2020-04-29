@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   FontAwesome,
@@ -17,40 +19,96 @@ import {
 } from "@expo/vector-icons";
 
 // Comps
-import Toolbar from "./Toolbar";
+import { BottomToolbar, TopToolbar } from "./Toolbar";
 import Gallery from "./Gallery";
 import { Overlay } from "./Overlay";
 
 // styles
 import { styles } from "./styles";
 
+const { width: winWidth, height: winHeight } = Dimensions.get("window");
+
+// Types
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+
+// Constants
+const projectDirectory = FileSystem.documentDirectory + "Camera/";
+
+/*
+ * ============================
+ *  Exported Camera Component
+ * ============================
+ */
 export default () => {
-  const camera = React.createRef();
+  const camera = React.createRef<Camera | null>();
 
   const [cameraPermission, setCameraPermission] = React.useState<boolean>();
-  const [cameraRollPermission, setCameraRollPermission] = React.useState<
-    boolean
-  >();
   const [capturing, setCapturing] = React.useState(false);
+  const [flashMode, setFlashMode] = React.useState<
+    typeof Camera.Constants.FlashMode
+  >(Camera.Constants.FlashMode.auto);
+  const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
 
   const handleTakePhoto = async () => {
     if (camera.current instanceof Camera) {
-      setCapturing(true);
-      console.log("Taking photo");
-      const { uri } = await camera.current.takePictureAsync();
+      try {
+        setCapturing(true);
+        const { uri } = await camera.current.takePictureAsync();
+        setCapturing(false);
 
-      // save to device media library
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      MediaLibrary.createAlbumAsync("aa_TimeShift", asset)
-        .then(() => {
-          console.log("Album created!");
-          setCapturing(false);
-        })
-        .catch((error: any) => {
-          console.log("err", error);
-          setCapturing(false);
-        });
+        // // save to filesystem
+        // await FileSystem.copyAsync({
+        //   from: image.uri,
+        //   to: projectDirectory! + "first_project/test.jpg"
+        // });
+
+        // save to device media library
+        const asset = await MediaLibrary.createAssetAsync(uri);
+
+        await MediaLibrary.createAlbumAsync("aa_TimeShift", asset, false);
+      } catch (error) {
+        console.log("err", error);
+      }
     }
+  };
+
+  const handleSelectOverlay = async () => {
+    // pause camera
+    camera.current?.pausePreview();
+
+    // display media library
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    // on click, if selected, set state
+    const result = await ImagePicker.launchImageLibraryAsync();
+
+    console.log({ result });
+    if (!result.cancelled) {
+      // get size of overlay image, update camera aspect if required
+
+      setOverlay(result);
+    }
+
+    // resume camera
+    camera.current?.resumePreview();
+  };
+
+  const handleClearOverlay = () => setOverlay(null);
+
+  const handleFlashMode = () => {
+    // cycles through flash modes: auto > flash > none
+    setFlashMode((prevState: typeof Camera.Constants.FlashMode) =>
+      prevState === Camera.Constants.FlashMode.auto
+        ? Camera.Constants.FlashMode.on
+        : prevState === Camera.Constants.FlashMode.on
+        ? Camera.Constants.FlashMode.off
+        : Camera.Constants.FlashMode.auto
+    );
   };
 
   React.useEffect(() => {
@@ -59,52 +117,58 @@ export default () => {
       console.log("mounting");
 
       const { status: cameraStatus } = await Camera.requestPermissionsAsync();
-      const {
-        status: mediaStatus
-      } = await MediaLibrary.requestPermissionsAsync();
+      // const {
+      //   status: mediaStatus
+      // } = await MediaLibrary.requestPermissionsAsync();
 
       setCameraPermission(cameraStatus === "granted");
-      setCameraRollPermission(mediaStatus === "granted");
     })();
-
-    return () => {
-      console.log("un-mounting");
-    };
   }, []);
 
-  if (cameraPermission === undefined || cameraRollPermission === undefined) {
+  if (cameraPermission === undefined) {
     return <View />;
   } else if (cameraPermission === false) {
     return <Text>Access to camera has been denied.</Text>;
-  } else if (cameraRollPermission === false) {
-    return (
-      <Text>Permission to save images to your device has been denied.</Text>
-    );
   }
 
+  console.log({ flashMode });
   return (
     <React.Fragment>
       <View>
         <Camera
           type={Camera.Constants.Type.back}
-          flashMode={Camera.Constants.FlashMode.off}
+          flashMode={flashMode}
           style={styles.preview}
           ref={(ref) => (camera.current = ref)}
-        />
+          ratio={"16:9"}
+        ></Camera>
+        {overlay && (
+          <ImageBackground
+            source={{ uri: overlay.uri }}
+            style={[
+              styles.preview,
+              {
+                opacity: 0.25
+              }
+            ]}
+          />
+        )}
       </View>
-
-      {/* {captures.length > 0 && <Gallery captures={captures} />} */}
-
-      <Toolbar
+      <TopToolbar
         capturing={capturing}
-        // flashMode={flashMode}
+        flashMode={flashMode}
+        setFlashMode={handleFlashMode}
         // cameraType={cameraType}
-        // setFlashMode={this.setFlashMode}
         // setCameraType={this.setCameraType}
-        // onCaptureIn={this.handleCaptureIn}
-        // onCaptureOut={this.handleCaptureOut}
-        // onLongCapture={this.handleLongCapture}
         onShortCapture={handleTakePhoto}
+      />
+
+      <BottomToolbar
+        capturing={capturing}
+        handleOverlay={handleSelectOverlay}
+        handleClearOverlay={handleClearOverlay}
+        onShortCapture={handleTakePhoto}
+        overlay={overlay}
       />
     </React.Fragment>
   );
