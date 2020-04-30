@@ -107,8 +107,6 @@ export default () => {
     }
   };
 
-  const hasDeviceMotion = async () => DeviceMotion.isAvailableAsync();
-
   React.useEffect(() => {
     // Check / Obtain permissions on mount
     (async () => {
@@ -125,24 +123,29 @@ export default () => {
 
   React.useEffect(() => {
     // subscribe to device motion - used to rotate icons
+    (async () => {
+      if (await await DeviceMotion.isAvailableAsync()) {
+        console.log("has dm");
 
-    if (hasDeviceMotion()) {
-      DeviceMotion.addListener(({ rotation }) => {
-        setOrientation(
-          rotation.beta > 0.75
-            ? "portrait-up"
-            : rotation.beta < -0.75
-            ? "portrait-down"
-            : rotation.gamma > 0
-            ? "landscape-right"
-            : "landscape-left"
-        );
-      });
+        DeviceMotion.addListener(({ rotation }) => {
+          setOrientation(
+            rotation.beta > 0.75
+              ? "portrait-up"
+              : rotation.beta < -0.75
+              ? "portrait-down"
+              : rotation.gamma > 0
+              ? "landscape-right"
+              : "landscape-left"
+          );
+        });
 
-      DeviceMotion.setUpdateInterval(1000);
-    }
+        DeviceMotion.setUpdateInterval(1000);
 
-    return () => DeviceMotion.removeAllListeners();
+        return () => DeviceMotion.removeAllListeners();
+      } else {
+        console.log("no dm");
+      }
+    })();
   }, []);
 
   if (cameraPermission === undefined) {
