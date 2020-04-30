@@ -160,18 +160,7 @@ export default () => {
         ref={(ref) => (camera.current = ref)}
         ratio={"16:9"}
       ></Camera>
-      {overlay && (
-        <ImageBackground
-          source={{ uri: overlay.uri }}
-          style={[
-            styles.preview,
-            {
-              opacity: 0.25
-            }
-          ]}
-        />
-      )}
-      <Overlay />
+      {overlay && <Overlay overlay={overlay} />}
       <TopToolbar
         flashMode={flashMode}
         setFlashMode={handleFlashMode}

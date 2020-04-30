@@ -46,6 +46,28 @@ export const styles = StyleSheet.create({
     width: 75,
     height: 75
   },
+  overlayMaskCenter: {
+    width: "100%",
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end"
+  },
+  overlayMaskFrame: {
+    backgroundColor: "rgba(1,1,1,0.6)"
+  },
+  overlayMaskOuter: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "space-around"
+  },
+  overlayMaskRow: {
+    width: "100%"
+  },
   preview: {
     height: winHeight,
     width: winWidth,

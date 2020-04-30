@@ -10,48 +10,56 @@ import {
 } from "react-native";
 
 // Comps
-import OpacitySlider from "./OpacitySlider";
+import VerticalSlider from "../VerticalSlider";
 
-export const Overlay = () => {
+// styles
+import { styles } from "./styles";
+
+// TS
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+
+export const Overlay = ({ overlay }: { overlay: ImageInfo }) => {
   const [type, setType] = React.useState(Camera.Constants.Type.back);
+  const [opacity, setOpacity] = React.useState(0.3);
 
   const { height, width } = Dimensions.get("window");
   // const maskRowHeight = Math.round((AppStore.height - 300) / 20);
   const maskColWidth = (width - 300) / 2;
 
   return (
-    <View style={styles.maskOutter}>
-      <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
-      <View style={[{ flex: 30 }, styles.maskCenter]} />
+    <View style={styles.overlayMaskOuter}>
+      <ImageBackground
+        source={{ uri: overlay.uri }}
+        style={[
+          styles.preview,
+          {
+            opacity
+          }
+        ]}
+      />
+      <View
+        style={[{ flex: 10 }, styles.overlayMaskRow, styles.overlayMaskFrame]}
+      />
+      <View style={[{ flex: 30 }, styles.overlayMaskCenter]}>
+        <VerticalSlider
+          value={1}
+          disabled={false}
+          min={10}
+          max={90}
+          onChange={(value: number) => setOpacity(value / 100)}
+          width={20}
+          height={250}
+          step={1}
+          borderRadius={5}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#111"
+          trackOpacity={true}
+        />
+      </View>
 
-      <OpacitySlider />
-
-      <View style={[{ flex: 10 }, styles.maskRow, styles.maskFrame]} />
+      <View
+        style={[{ flex: 10 }, styles.overlayMaskRow, styles.overlayMaskFrame]}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  maskOutter: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "space-around"
-  },
-  maskInner: {
-    width: 300,
-    backgroundColor: "transparent",
-    borderColor: "white",
-    borderWidth: 1
-  },
-  maskFrame: {
-    backgroundColor: "rgba(1,1,1,0.6)"
-  },
-  maskRow: {
-    width: "100%"
-  },
-  maskCenter: { flexDirection: "row" }
-});

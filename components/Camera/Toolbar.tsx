@@ -152,7 +152,17 @@ export const BottomToolbar = ({
                   height: 60
                 }}
                 imageStyle={{
-                  borderRadius: 30
+                  borderRadius: 30,
+                  transform: [
+                    {
+                      rotate: orientation.startsWith("portrait")
+                        ? "0deg"
+                        : orientation === "landscape-left"
+                        ? "-90deg"
+                        : "90deg"
+                    },
+                    { perspective: 1000 }
+                  ]
                 }}
               />
             ) : (

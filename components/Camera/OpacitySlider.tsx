@@ -1,29 +1,29 @@
 import React from "react";
 // import Slider from "@react-native-community/slider";
-import { Slider } from "react-native";
+import { PanResponder, Text, View } from "react-native";
 
-import opacityIcon from "../../assets/icon_opacity.png";
+import VerticalSlider from "../VerticalSlider";
+
+// import opacityIcon from "../../assets/icon_opacity.png";
 
 export default () => {
   return (
-    <Slider
-      style={styles.root}
-      minimumValue={0}
-      maximumValue={100}
-      minimumTrackTintColor="#FFFFFF"
-      maximumTrackTintColor="lime"
-      step={1}
-      thumbTintColor="cyan"
-    />
+    <View>
+      <VerticalSlider
+        value={1}
+        disabled={false}
+        min={0}
+        max={100}
+        onChange={(value: number) => {
+          console.log("CHANGE", value);
+        }}
+        width={50}
+        height={300}
+        step={1}
+        borderRadius={5}
+        minimumTrackTintColor={"gray"}
+        maximumTrackTintColor={"tomato"}
+      />
+    </View>
   );
-};
-
-const styles = {
-  root: {
-    width: 200,
-    height: 40,
-    transform: [{ rotateZ: "-90deg" }],
-    marginRight: -100,
-    marginLeft: -100
-  }
 };

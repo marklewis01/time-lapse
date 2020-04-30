@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { Appbar } from "react-native-paper";
+import { Appbar, Button } from "react-native-paper";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
 
@@ -8,6 +8,7 @@ import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // Screens
 import CameraScreen from "./CameraScreen";
+import TestScreen from "./TestScreen";
 
 // Comps
 import { ProjectCard } from "../components/Project";
@@ -31,6 +32,7 @@ export default function HomeScreen({ navigation }: Props) {
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen name="Test Screen" component={TestScreen} />
     </Stack.Navigator>
   );
 }
@@ -90,6 +92,12 @@ const Home = ({ navigation }: any) => {
           onPress={() => navigation.navigate("Camera")}
         />
       </Appbar.Header>
+
+      <View style={{ marginVertical: 20 }}>
+        <Button onPress={() => navigation.navigate("Test Screen")}>
+          Go to Test Screen
+        </Button>
+      </View>
 
       <FlatList
         data={projects}
