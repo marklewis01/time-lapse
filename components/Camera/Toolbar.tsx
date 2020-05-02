@@ -1,23 +1,29 @@
 import React from "react";
 import {
+  Dimensions,
   ImageBackground,
-  View,
+  // Slider,
+  StatusBar,
   TouchableWithoutFeedback,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from "react-native";
 import { IconButton } from "react-native-paper";
-import { Col, Row, Grid } from "react-native-easy-grid";
+import Constants from "expo-constants";
 import { Camera } from "expo-camera";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Slider from "react-native-slider";
 
 // Styles
-import { styles } from "./styles";
+// import { styles } from "./styles";
 
 // Types
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import { orientation } from "../../types";
 
+const { width: winWidth, height: winHeight } = Dimensions.get("window");
 const { FlashMode: CameraFlashModes, Type: CameraTypes } = Camera.Constants;
+const ICON_SIZE = 30;
 
 interface Props {
   cameraType: typeof CameraTypes;
@@ -34,16 +40,26 @@ export const TopToolbar = ({
   setFlashMode,
   setCameraType
 }: Props) => (
-  <Grid style={styles.topToolbar}>
-    <Row>
-      <Col style={styles.alignCenter}>
+  <View style={styles.options.root}>
+    <StatusBar hidden />
+    <View style={styles.options.overlayBg} />
+
+    <View
+      style={{
+        flex: 1,
+        flexDirection:
+          orientation === "landscape-right" ? "row-reverse" : "row",
+        marginHorizontal: 15
+      }}
+    >
+      <View style={[styles.options.buttonRoot, { flex: 2 }]}>
         <IconButton
-          onPress={setCameraType}
+          onPress={() => console.log("pressed filter")}
           icon={() => (
-            <Ionicons
-              name="md-reverse-camera"
+            <MaterialIcons
+              name="filter-b-and-w"
+              size={ICON_SIZE}
               color="white"
-              size={25}
               style={{
                 transform: [
                   {
@@ -59,9 +75,33 @@ export const TopToolbar = ({
             />
           )}
         />
-      </Col>
-      <Col style={styles.alignCenter}>
-        {cameraType === Camera.Constants.Type.back ? (
+      </View>
+      <View style={styles.options.buttonRoot}>
+        <IconButton
+          onPress={() => console.log("pressed hdr")}
+          icon={() => (
+            <MaterialIcons
+              name="hdr-on"
+              size={ICON_SIZE}
+              color="white"
+              style={{
+                transform: [
+                  {
+                    rotate: orientation.startsWith("portrait")
+                      ? "0deg"
+                      : orientation === "landscape-left"
+                      ? "90deg"
+                      : "-90deg"
+                  },
+                  { perspective: 1000 }
+                ]
+              }}
+            />
+          )}
+        />
+      </View>
+      <View style={styles.options.buttonRoot}>
+        {cameraType === Camera.Constants.Type.back && (
           <IconButton
             onPress={setFlashMode}
             icon={() => (
@@ -73,8 +113,6 @@ export const TopToolbar = ({
                     ? "flash-auto"
                     : "flash-off"
                 }
-                color="white"
-                size={25}
                 style={{
                   transform: [
                     {
@@ -87,97 +125,234 @@ export const TopToolbar = ({
                     { perspective: 1000 }
                   ]
                 }}
+                size={ICON_SIZE}
+                color="white"
               />
             )}
           />
-        ) : null}
-      </Col>
-    </Row>
-  </Grid>
+        )}
+      </View>
+      <View style={styles.options.buttonRoot}>
+        <IconButton
+          onPress={setCameraType}
+          icon={() => (
+            <Ionicons
+              name="ios-reverse-camera"
+              size={ICON_SIZE}
+              color="white"
+              style={{
+                transform: [
+                  {
+                    rotate: orientation.startsWith("portrait")
+                      ? "0deg"
+                      : orientation === "landscape-left"
+                      ? "90deg"
+                      : "-90deg"
+                  },
+                  { perspective: 1000 }
+                ]
+              }}
+            />
+          )}
+        />
+      </View>
+    </View>
+  </View>
 );
 
 export const BottomToolbar = ({
   capturing = false,
   handleOverlay,
   handleClearOverlay,
+  handleOverlayOpacity,
   onShortCapture,
   orientation,
+  opacity,
   overlay
 }: {
   capturing: boolean | null;
-  handleOverlay: () => Promise<void>;
-  handleClearOverlay: () => void;
-  onShortCapture: () => Promise<void>;
+  handleOverlay(): Promise<void>;
+  handleClearOverlay(): void;
+  handleOverlayOpacity(value: number): void;
+  onShortCapture(): Promise<void>;
+  opacity: number;
   orientation: orientation;
   overlay: ImageInfo | null;
 }) => (
-  <Grid style={styles.bottomToolbar}>
-    <Row style={{ alignItems: "center" }}>
-      <Col />
-      <Col style={styles.alignCenter}>
-        <TouchableWithoutFeedback onPress={onShortCapture}>
-          <View
-            style={[styles.captureBtn, capturing && styles.captureBtnActive]}
-          >
-            {capturing && <View style={styles.captureBtnInternal} />}
-          </View>
-        </TouchableWithoutFeedback>
-      </Col>
-      <Col style={{ alignItems: "center", justifyContent: "center" }}>
+  <View
+    style={[
+      styles.actions.root,
+      {
+        flexDirection: orientation === "landscape-right" ? "row-reverse" : "row"
+      }
+    ]}
+  >
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <View>
+        {overlay && (
+          <Slider
+            value={opacity * 100}
+            step={1}
+            onValueChange={handleOverlayOpacity}
+            minimumValue={0}
+            maximumValue={100}
+            thumbTintColor="#FFF"
+            thumbTouchSize={{ width: 100, height: 100 }}
+            trackStyle={{ height: 2 }}
+            thumbStyle={{ width: 4, height: 30 }}
+            style={{
+              width: 80
+            }}
+          />
+        )}
+      </View>
+    </View>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 10
+      }}
+    >
+      <TouchableWithoutFeedback onPress={onShortCapture}>
         <View
-          style={{
-            position: "relative",
-            flexDirection: orientation.startsWith("portrait")
-              ? "row"
-              : "column-reverse",
-            alignItems: "center",
-            transform: [
-              {
-                rotate: orientation.startsWith("portrait")
-                  ? "0deg"
-                  : orientation === "landscape-left"
-                  ? "90deg"
-                  : "-90deg"
-              },
-              { perspective: 1000 }
-            ]
-          }}
+          style={[
+            styles.actions.captureBtn,
+            capturing && styles.actions.captureBtnActive
+          ]}
         >
-          <TouchableOpacity onPress={handleOverlay}>
-            {overlay ? (
-              <ImageBackground
-                source={{ uri: overlay.uri }}
-                style={{
-                  width: 60,
-                  height: 60
-                }}
-                imageStyle={{
-                  borderRadius: 30,
-                  transform: [
-                    {
-                      rotate: orientation.startsWith("portrait")
-                        ? "0deg"
-                        : orientation === "landscape-left"
-                        ? "-90deg"
-                        : "90deg"
-                    },
-                    { perspective: 1000 }
-                  ]
-                }}
-              />
-            ) : (
-              <Ionicons name="ios-image" color="white" size={50} />
-            )}
-          </TouchableOpacity>
-          {overlay ? (
-            <View style={{ padding: 5 }}>
-              <TouchableOpacity onPress={handleClearOverlay}>
-                <Ionicons name="ios-remove-circle" color="red" size={30} />
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          <View
+            style={[
+              styles.actions.captureBtnInternal,
+              capturing && styles.actions.captureBtnInternalActive
+            ]}
+          />
         </View>
-      </Col>
-    </Row>
-  </Grid>
+      </TouchableWithoutFeedback>
+    </View>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        transform: [
+          {
+            rotate: orientation.startsWith("portrait")
+              ? "0deg"
+              : orientation === "landscape-left"
+              ? "90deg"
+              : "-90deg"
+          },
+          { perspective: 1000 }
+        ],
+        position: "relative"
+      }}
+    >
+      <TouchableOpacity onPress={handleOverlay}>
+        {overlay ? (
+          <ImageBackground
+            source={{ uri: overlay.uri }}
+            style={{
+              width: 60,
+              height: 60
+            }}
+            imageStyle={{
+              borderRadius: 30
+            }}
+          />
+        ) : (
+          <Ionicons name="ios-image" color="white" size={50} />
+        )}
+      </TouchableOpacity>
+      {overlay && (
+        <View style={{ position: "absolute", right: 15, top: -15 }}>
+          <TouchableOpacity onPress={handleClearOverlay}>
+            <Ionicons name="ios-remove-circle" color="red" size={30} />
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  </View>
 );
+
+/**
+ * Local Styles
+ */
+
+const rel: "relative" = "relative";
+const abs: "absolute" = "absolute";
+const center: "center" = "center";
+const spaceBetween: "space-between" = "space-between";
+const row: "row" = "row";
+
+const styles = {
+  backgroundImage: {
+    flex: 1
+  },
+  actions: {
+    root: {
+      position: abs,
+      bottom: 0,
+      flexDirection: row,
+      alignItems: center,
+      justifyContent: spaceBetween,
+      padding: 15
+    },
+    captureBtn: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 80,
+      height: 80,
+      borderWidth: 5,
+      borderRadius: 40,
+      borderColor: "#FFFFFF"
+    },
+    captureBtnInternal: {
+      width: 68,
+      height: 68,
+      borderWidth: 2,
+      borderRadius: 34,
+      backgroundColor: "#FFFFFF",
+      borderColor: "transparent"
+    },
+    captureBtnActive: {
+      width: 80,
+      height: 80
+    },
+    captureBtnInternalActive: {
+      backgroundColor: "red"
+    }
+  },
+  cameraViewport: {
+    flex: 1
+  },
+  options: {
+    root: {
+      position: rel,
+      height: 60
+    },
+    buttonRoot: {
+      flex: 1,
+      justifyContent: center,
+      alignItems: center
+    },
+    overlayBg: {
+      position: abs,
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      backgroundColor: "#000",
+      opacity: 0.4
+    }
+  }
+};

@@ -36,6 +36,7 @@ export default () => {
     "portrait-up"
   );
   const [overlay, setOverlay] = React.useState<ImageInfo | null>(null);
+  const [opacity, setOpacity] = React.useState(0.4);
 
   const handleCameraType = () => {
     setCameraType((prevState: typeof Camera.Constants.Type) =>
@@ -57,6 +58,8 @@ export default () => {
         : Camera.Constants.FlashMode.auto
     );
   };
+
+  const handleOverlayOpacity = (value: number) => setOpacity(value / 100);
 
   const handleSelectOverlay = async () => {
     // pause camera
@@ -88,8 +91,10 @@ export default () => {
     if (camera.current instanceof Camera) {
       try {
         setCapturing(true);
+        setTimeout(() => {
+          setCapturing(false);
+        }, 200);
         const { uri } = await camera.current.takePictureAsync();
-        setCapturing(false);
 
         // // save to filesystem
         // await FileSystem.copyAsync({
@@ -163,7 +168,6 @@ export default () => {
         ref={(ref) => (camera.current = ref)}
         ratio={"16:9"}
       ></Camera>
-      {overlay && <Overlay overlay={overlay} />}
       <TopToolbar
         flashMode={flashMode}
         setFlashMode={handleFlashMode}
@@ -171,12 +175,16 @@ export default () => {
         setCameraType={handleCameraType}
         orientation={orientation}
       />
-
+      {/* <View style={{ flex: 1 }}> */}
+      {overlay && <Overlay overlay={overlay} opacity={opacity} />}
+      {/* </View> */}
       <BottomToolbar
         capturing={capturing}
         handleOverlay={handleSelectOverlay}
+        handleOverlayOpacity={handleOverlayOpacity}
         handleClearOverlay={handleClearOverlay}
         onShortCapture={handleTakePhoto}
+        opacity={opacity}
         overlay={overlay}
         orientation={orientation}
       />

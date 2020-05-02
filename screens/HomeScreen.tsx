@@ -31,7 +31,11 @@ export default function HomeScreen({ navigation }: Props) {
       }}
     >
       <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen
+        name="Camera"
+        component={CameraScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Test Screen"
         component={TestScreen}

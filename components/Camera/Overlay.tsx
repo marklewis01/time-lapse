@@ -18,10 +18,13 @@ import { styles } from "./styles";
 // TS
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 
-export const Overlay = ({ overlay }: { overlay: ImageInfo }) => {
-  const [type, setType] = React.useState(Camera.Constants.Type.back);
-  const [opacity, setOpacity] = React.useState(0.3);
-
+export const Overlay = ({
+  opacity,
+  overlay
+}: {
+  opacity: number;
+  overlay: ImageInfo;
+}) => {
   const { height, width } = Dimensions.get("window");
   // const maskRowHeight = Math.round((AppStore.height - 300) / 20);
   const maskColWidth = (width - 300) / 2;
@@ -37,11 +40,8 @@ export const Overlay = ({ overlay }: { overlay: ImageInfo }) => {
           }
         ]}
       />
-      <View
-        style={[{ flex: 10 }, styles.overlayMaskRow, styles.overlayMaskFrame]}
-      />
-      <View style={[{ flex: 30 }, styles.overlayMaskCenter]}>
-        <VerticalSlider
+
+      {/* <VerticalSlider
           value={1}
           disabled={false}
           min={10}
@@ -54,12 +54,7 @@ export const Overlay = ({ overlay }: { overlay: ImageInfo }) => {
           minimumTrackTintColor="#FFFFFF"
           maximumTrackTintColor="#111"
           trackOpacity={true}
-        />
-      </View>
-
-      <View
-        style={[{ flex: 10 }, styles.overlayMaskRow, styles.overlayMaskFrame]}
-      />
+        /> */}
     </View>
   );
 };
