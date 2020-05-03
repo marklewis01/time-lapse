@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { Appbar, Button } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
 
@@ -17,12 +18,7 @@ import { FlatList } from "react-native-gesture-handler";
 // Navigation
 const Stack = createStackNavigator();
 
-// TS
-type Props = {
-  navigation: any; // TODO: find correct type which extends DrawerActions
-};
-
-export default function HomeScreen({ navigation }: Props) {
+export default function HomeScreen() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -51,7 +47,9 @@ export default function HomeScreen({ navigation }: Props) {
  * ================================
  */
 
-const Home = ({ navigation }: any) => {
+const Home = () => {
+  const navigation = useNavigation();
+
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean
   >();
