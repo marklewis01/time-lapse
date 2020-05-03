@@ -8,6 +8,7 @@ import { DeviceMotion } from "expo-sensors";
 // Comps
 import { ActionsToolbar, OptionsToolbar } from "../components/Camera/Toolbar";
 import { Overlay } from "../components/Camera/Overlay";
+import FlashAnimation from "../components/Camera/FlashAnimation";
 
 // styles
 import { styles } from "../components/Camera/styles";
@@ -180,6 +181,8 @@ export default () => {
         overlay={overlay}
         orientation={orientation}
       />
+      {capturing && <FlashAnimation />}
+      {/* <FlashAnimation /> */}
     </React.Fragment>
   );
 };
