@@ -7,7 +7,7 @@ import { styles } from "./styles";
 // TS
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 
-export const Overlay = ({
+export default ({
   opacity,
   overlay
 }: {

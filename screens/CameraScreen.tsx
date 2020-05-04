@@ -6,9 +6,13 @@ import * as ImagePicker from "expo-image-picker";
 import { DeviceMotion } from "expo-sensors";
 
 // Comps
-import { ActionsToolbar, OptionsToolbar } from "../components/Camera/Toolbar";
-import { Overlay } from "../components/Camera/Overlay";
-import FlashAnimation from "../components/Camera/FlashAnimation";
+// import { Overlay } from "../components/Camera/Overlay";
+import {
+  ActionsToolbar,
+  FlashAnimation,
+  OptionsToolbar,
+  Overlay
+} from "../components/Camera";
 
 // styles
 import { styles } from "../components/Camera/styles";
@@ -182,7 +186,6 @@ export default () => {
         orientation={orientation}
       />
       {capturing && <FlashAnimation />}
-      {/* <FlashAnimation /> */}
     </React.Fragment>
   );
 };
