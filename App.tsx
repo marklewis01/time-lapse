@@ -9,7 +9,11 @@ import {
   Colors
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator,
+  DrawerContentComponentProps,
+  DrawerContentOptions
+} from "@react-navigation/drawer";
 
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
@@ -23,7 +27,9 @@ const PREFERENCES_KEY = "APP_PREFERENCES";
 const PreferencesContext = React.createContext<any>(null);
 
 // Drawer
-const DrawerContent = () => {
+const DrawerContent = (
+  props: DrawerContentComponentProps<DrawerContentOptions>
+) => {
   return (
     <PreferencesContext.Consumer>
       {(preferences) => (
@@ -32,6 +38,7 @@ const DrawerContent = () => {
           toggleRTL={preferences.toggleRtl}
           isRTL={preferences.rtl}
           isDarkTheme={preferences.theme === customDarkTheme}
+          {...props}
         />
       )}
     </PreferencesContext.Consumer>
@@ -160,7 +167,7 @@ export default function App() {
             AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
           }
         >
-          <Drawer.Navigator drawerContent={() => <DrawerContent />}>
+          <Drawer.Navigator drawerContent={DrawerContent}>
             <Drawer.Screen name="Home" component={HomeScreen} />
           </Drawer.Navigator>
         </NavigationContainer>

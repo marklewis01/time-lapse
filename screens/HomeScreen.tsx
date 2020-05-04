@@ -26,7 +26,7 @@ export default function HomeScreen() {
         title: ""
       }}
     >
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen
         name="Camera"
         component={CameraScreen}
@@ -48,7 +48,7 @@ export default function HomeScreen() {
  */
 
 const Home = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean

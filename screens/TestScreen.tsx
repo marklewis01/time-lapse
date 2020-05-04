@@ -1,89 +1,23 @@
 import React from "react";
-import { Text, View, ImageBackground } from "react-native";
+import { Text, View, ImageBackground, useWindowDimensions } from "react-native";
 import Constants from "expo-constants";
 import { IconButton, Colors } from "react-native-paper";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+// import ReactCompareImage from "react-compare-image";
+import ComparisonSlider from "react-native-comparison-slider";
 
-// import VerticalSlider from "../components/VerticalSlider";
-import { BottomToolbar, TopToolbar } from "../components/Camera/Toolbar";
-
-const ICON_SIZE = 30;
-
-export default ({ navigation }: any) => {
+export default () => {
+  const { height, width } = useWindowDimensions();
   return (
     <View style={styles.container}>
-      {/* <View>
-        <Text>Testing Page</Text>
-        <Text>Device: {Constants.deviceName}</Text>
-        <Text>Year: {Constants.deviceYearClass}</Text>
-        <Text>System: {Constants.systemVersion}</Text>
-      </View> */}
-
-      <ImageBackground
-        source={require("../assets/greenwall-section-4.jpg")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.optionsOverlayRoot}>
-          <View style={styles.optionsOverlayBg} />
-
-          <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 10 }}>
-            <View style={[styles.options.buttonRoot, { flex: 2 }]}>
-              <IconButton
-                onPress={() => console.log("pressed 1")}
-                icon={() => (
-                  <MaterialIcons
-                    name="filter-b-and-w"
-                    style={{ transform: [{ rotate: "90deg" }] }}
-                    size={ICON_SIZE}
-                    color="white"
-                  />
-                )}
-              />
-            </View>
-            <View style={styles.options.buttonRoot}>
-              <IconButton
-                onPress={() => console.log("pressed 3")}
-                icon={() => (
-                  <MaterialIcons
-                    name="hdr-on"
-                    style={{ transform: [{ rotate: "90deg" }] }}
-                    size={ICON_SIZE}
-                    color="white"
-                  />
-                )}
-              />
-            </View>
-            <View style={styles.options.buttonRoot}>
-              <IconButton
-                onPress={() => console.log("pressed 4")}
-                icon={() => (
-                  <MaterialIcons
-                    name="flash-auto"
-                    style={{ transform: [{ rotate: "90deg" }] }}
-                    size={ICON_SIZE}
-                    color="white"
-                  />
-                )}
-              />
-            </View>
-            <View style={styles.options.buttonRoot}>
-              <IconButton
-                onPress={() => console.log("pressed 5")}
-                icon={() => (
-                  <Ionicons
-                    name="ios-reverse-camera"
-                    style={{ transform: [{ rotate: "90deg" }] }}
-                    size={ICON_SIZE}
-                    color="white"
-                  />
-                )}
-              />
-            </View>
-          </View>
-        </View>
-        <View style={styles.cameraViewport}></View>
-        <View style={styles.actionsOverlay}></View>
-      </ImageBackground>
+      <Text>Testing Slider</Text>
+      <ComparisonSlider
+        imageWidth={width}
+        imageHeight={height}
+        initialPosition={50}
+        leftImage={require("../assets/greenwall-section-4.jpg")}
+        rightImage={require("../assets/greenwall-section-4-b.jpg")}
+      />
     </View>
   );
 };

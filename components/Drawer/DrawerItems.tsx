@@ -10,42 +10,46 @@ import {
   Button
 } from "react-native-paper";
 
-type Props = {
+import {
+  DrawerContentComponentProps,
+  DrawerContentOptions
+} from "@react-navigation/drawer";
+
+interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
   toggleTheme: () => void;
   toggleRTL: () => void;
   isRTL: boolean;
   isDarkTheme: boolean;
-};
+}
 
 const DrawerItemsData = [
-  { label: "Inbox", icon: "inbox", key: 0 },
-  { label: "Starred", icon: "star", key: 1 },
-  { label: "Sent mail", icon: "send", key: 2 },
-  { label: "Colored label", icon: "palette", key: 3 },
-  { label: "A very long title that will be truncated", icon: "delete", key: 4 }
+  { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 },
+  { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
+  { label: "Test Screen", icon: "test-tube", navigation: "Test Screen", key: 2 }
 ];
 
-const DrawerItems = ({ toggleTheme, toggleRTL, isRTL, isDarkTheme }: Props) => {
-  const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
-
-  const _setDrawerItem = (index: number) => setDrawerItemIndex(index);
-
+const DrawerItems = ({
+  toggleTheme,
+  toggleRTL,
+  isRTL,
+  isDarkTheme,
+  navigation
+}: Props) => {
   const { colors } = useTheme();
+  const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
-      <Drawer.Section title="Example items">
+      <Drawer.Section title="Photo Lapse">
         {DrawerItemsData.map((props, index) => (
           <Drawer.Item
             {...props}
-            key={props.key}
-            theme={
-              props.key === 3
-                ? { colors: { primary: Colors.tealA200 } }
-                : undefined
-            }
+            key={index}
             active={drawerItemIndex === index}
-            onPress={() => _setDrawerItem(index)}
+            onPress={() => {
+              setDrawerItemIndex(index);
+              navigation.navigate(props.navigation);
+            }}
           />
         ))}
       </Drawer.Section>
