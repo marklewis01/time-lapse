@@ -170,7 +170,7 @@ export const OptionsToolbar = ({
         </View>
         <View style={styles.options.buttonRoot}>
           <IconButton
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.navigate("HomeScreen")}
             icon={() => (
               <Ionicons name="ios-close" size={ICON_SIZE} color="white" />
             )}
