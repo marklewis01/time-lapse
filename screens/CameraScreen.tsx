@@ -129,8 +129,6 @@ export default () => {
     // subscribe to device motion - used to rotate icons
     (async () => {
       if (await await DeviceMotion.isAvailableAsync()) {
-        console.log("has dm");
-
         DeviceMotion.addListener(({ rotation }) => {
           setOrientation(
             rotation.beta > 0.75
@@ -147,6 +145,7 @@ export default () => {
 
         return () => DeviceMotion.removeAllListeners();
       } else {
+        // no device motion. Do nothing.
         console.log("no dm");
       }
     })();

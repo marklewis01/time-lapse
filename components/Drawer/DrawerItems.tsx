@@ -25,7 +25,12 @@ interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
 const DrawerItemsData = [
   { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 },
   { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
-  { label: "Test Screen", icon: "test-tube", navigation: "Test Screen", key: 2 }
+  {
+    label: "Test Screen",
+    icon: "test-tube",
+    navigation: "Test Screen",
+    key: 2
+  }
 ];
 
 const DrawerItems = ({

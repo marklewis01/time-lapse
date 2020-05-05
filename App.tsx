@@ -1,6 +1,7 @@
 import React from "react";
 import { AsyncStorage, I18nManager } from "react-native";
 import { Updates } from "expo";
+import * as SQLite from "expo-sqlite";
 import {
   DarkTheme,
   DefaultTheme,
@@ -15,6 +16,8 @@ import {
   DrawerContentOptions
 } from "@react-navigation/drawer";
 
+import moment from "moment";
+
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
@@ -22,6 +25,10 @@ import DrawerItems from "./components/Drawer/DrawerItems";
 // Local Storage Settings
 const PERSISTENCE_KEY = "NAVIGATION_STATE";
 const PREFERENCES_KEY = "APP_PREFERENCES";
+
+// DB
+import { selectProjects, createProjectTable } from "./db";
+// export const db = SQLite.openDatabase("db.db");
 
 // Context
 const PreferencesContext = React.createContext<any>(null);
@@ -140,6 +147,27 @@ export default function App() {
 
     savePrefs();
   }, [rtl, theme]);
+
+  // local db
+  React.useEffect(() => {
+    // check if tables exists
+    selectProjects()
+      .then((projects) => {
+        if (!projects.length) {
+          console.log("creating table");
+          createProjectTable();
+        } else {
+          console.log({ projects });
+        }
+      })
+      .catch((e) => {
+        try {
+          createProjectTable();
+        } catch (err) {
+          console.error(err);
+        }
+      });
+  }, []);
 
   const preferences = React.useMemo(
     () => ({
