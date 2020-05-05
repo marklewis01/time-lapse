@@ -24,7 +24,7 @@ import TestScreen from "./TestScreen";
 import { ProjectCard } from "../components/Project";
 
 // DB
-import { selectProjects, addProject } from "../db";
+import { selectManyProjects, addProject } from "../db";
 import { IProject, ScreenStackParamList } from "../types";
 
 // Navigation
@@ -77,7 +77,7 @@ const Home = () => {
 
   const handleGetProjects = async () => {
     setRefreshing(true);
-    setProjects(await selectProjects());
+    setProjects(await selectManyProjects());
     setRefreshing(false);
   };
 
@@ -87,12 +87,13 @@ const Home = () => {
       if (newProject === "") return;
 
       // do db work
-      await addProject(newProject);
+      const id = (await addProject(newProject)) as number;
       handleCloseModal();
+      navigation.navigate("ProjectScreen", { id });
 
-      await handleGetProjects();
+      // await handleGetProjects();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

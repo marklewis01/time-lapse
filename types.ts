@@ -25,6 +25,6 @@ export interface ISQLiteSelectResponse extends SQLite.SQLResultSet {
 export type ScreenStackParamList = {
   HomeScreen: undefined;
   Camera: undefined;
-  ProjectScreen: IProject;
+  ProjectScreen: { id: number };
   TestScreen: undefined;
 };
