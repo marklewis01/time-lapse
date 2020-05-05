@@ -17,6 +17,7 @@ import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // Screens
 import CameraScreen from "./CameraScreen";
+import ProjectScreen from "./ProjectScreen";
 import TestScreen from "./TestScreen";
 
 // Comps
@@ -24,10 +25,10 @@ import { ProjectCard } from "../components/Project";
 
 // DB
 import { selectProjects, addProject } from "../db";
-import { IProject } from "../types";
+import { IProject, ScreenStackParamList } from "../types";
 
 // Navigation
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<ScreenStackParamList>();
 
 export default function HomeScreen() {
   return (
@@ -40,7 +41,8 @@ export default function HomeScreen() {
     >
       <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="Camera" component={CameraScreen} />
-      <Stack.Screen name="Test Screen" component={TestScreen} />
+      <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
+      <Stack.Screen name="TestScreen" component={TestScreen} />
     </Stack.Navigator>
   );
 }
@@ -169,19 +171,8 @@ const styles = StyleSheet.create({
     marginTop: 22
   },
   modalView: {
-    // margin: "auto",
-    // backgroundColor: "white",
-    // borderRadius: 20,
     padding: 20,
     alignItems: "center"
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
-    // elevation: 5
   },
   openButton: {
     backgroundColor: "#F194FF",

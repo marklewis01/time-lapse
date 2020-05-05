@@ -28,7 +28,7 @@ const DrawerItemsData = [
   {
     label: "Test Screen",
     icon: "test-tube",
-    navigation: "Test Screen",
+    navigation: "TestScreen",
     key: 2
   }
 ];

@@ -1,7 +1,6 @@
 import React from "react";
 import { AsyncStorage, I18nManager } from "react-native";
 import { Updates } from "expo";
-import * as SQLite from "expo-sqlite";
 import {
   DarkTheme,
   DefaultTheme,
@@ -16,8 +15,6 @@ import {
   DrawerContentOptions
 } from "@react-navigation/drawer";
 
-import moment from "moment";
-
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
@@ -28,7 +25,6 @@ const PREFERENCES_KEY = "APP_PREFERENCES";
 
 // DB
 import { selectProjects, createProjectTable } from "./db";
-// export const db = SQLite.openDatabase("db.db");
 
 // Context
 const PreferencesContext = React.createContext<any>(null);

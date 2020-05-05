@@ -38,7 +38,7 @@ export const selectProjects = (): Promise<[]> =>
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `SELECT * FROM project`,
+          `SELECT * FROM project ORDER BY updated_at DESC`,
           [],
           (_, { rows: { _array } }: { rows: any }) => {
             projects = _array;
@@ -57,7 +57,7 @@ export const selectProjects = (): Promise<[]> =>
 // Project
 export const addProject = (name: string) => {
   return new Promise((resolve, reject) => {
-    const date = moment().format("YYYY-MM-DD");
+    const date = moment().format();
     db.transaction(
       (tx) => {
         tx.executeSql(
