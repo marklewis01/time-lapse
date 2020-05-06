@@ -160,12 +160,18 @@ export const insertOneImage = (projectId: number, image: Asset) => {
     db.transaction(
       (tx) => {
         tx.executeSql(
+          // insert details into image table
           `INSERT INTO image (uri, project_id, created_at) VALUES (?,?,?)`,
           [image.uri, projectId, date],
           (_, response) => {
             resolve(response.insertId);
           }
         );
+        // update project updated_at timestamp
+        tx.executeSql(`UPDATE project SET updated_at = ? WHERE id = ?`, [
+          date,
+          projectId
+        ]);
       },
       (err) => reject(err)
     );

@@ -61,7 +61,6 @@ export const OptionsToolbar = ({
           flex: 1,
           flexDirection:
             orientation === "landscape-right" ? "row-reverse" : "row"
-          // marginHorizontal: 15
         }}
       >
         <View style={[styles.options.buttonRoot, { flex: 2 }]}>
@@ -170,7 +169,7 @@ export const OptionsToolbar = ({
         </View>
         <View style={styles.options.buttonRoot}>
           <IconButton
-            onPress={() => navigation.navigate("HomeScreen")}
+            onPress={() => navigation.goBack()}
             icon={() => (
               <Ionicons name="ios-close" size={ICON_SIZE} color="white" />
             )}

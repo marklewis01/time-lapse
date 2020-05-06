@@ -5,8 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  View,
-  findNodeHandle
+  View
 } from "react-native";
 import {
   ActivityIndicator,
@@ -17,10 +16,8 @@ import {
   IconButton,
   Menu,
   Portal,
-  ProgressBar,
-  Provider
+  ProgressBar
 } from "react-native-paper";
-import moment from "moment";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { ScreenStackParamList } from "../types";
@@ -48,7 +45,6 @@ export default ({ navigation, route }: Props) => {
   const [project, setProject] = React.useState<IProject>();
 
   const [menu, setMenu] = React.useState(false);
-  const touchableRef = React.createRef();
 
   const handleGetProject = async () => {
     // get from project table
@@ -109,17 +105,7 @@ export default ({ navigation, route }: Props) => {
           />
         </Menu>
       </Appbar.Header>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginVertical: 20
-        }}
-      >
-        <Button mode="contained" onPress={handleTakePhoto}>
-          Take Photo
-        </Button>
-      </View>
+
       <View
         style={{
           flex: 1
@@ -167,7 +153,7 @@ export default ({ navigation, route }: Props) => {
       )}
 
       <Appbar style={styles.bottomAppBar}>
-        <Appbar.Action icon="delete" onPress={() => console.log("delete")} />
+        <Appbar.Action icon="camera" onPress={handleTakePhoto} />
       </Appbar>
     </SafeAreaView>
   ) : (
@@ -181,7 +167,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  bottomAppBar: {},
+  bottomAppBar: {
+    justifyContent: "center"
+  },
   image: {
     width: 100,
     height: 100

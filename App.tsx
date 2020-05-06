@@ -80,11 +80,23 @@ export default function App() {
   React.useEffect(() => {
     const restoreState = async () => {
       try {
-        const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
+        const savedStateString: any = await AsyncStorage.getItem(
+          PERSISTENCE_KEY
+        );
 
         const state = JSON.parse(savedStateString || "");
 
-        setInitialState(state);
+        // not certain if required, but during development, if app
+        // starts with only 'Camera' in route history, going 'back'
+        // throws error and user cannot escape Camera screen.
+
+        const saferNavState =
+          state.routes[0].state.routes.length === 0 &&
+          state.routes[0].state.routes[0].name === "Camera"
+            ? ""
+            : state;
+
+        setInitialState(saferNavState);
       } catch (e) {
         // ignore error
       } finally {
