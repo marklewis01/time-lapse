@@ -45,7 +45,6 @@ const DrawerItems = ({
   const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
 
   const handleReset = () => {
-    console.log("reset pressed");
     return resetTables()
       .then(() => console.log("Reset successfully"))
       .catch((e) => console.error(e));

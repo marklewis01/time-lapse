@@ -4,15 +4,21 @@ import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
 import { DeviceMotion } from "expo-sensors";
+import { RouteProp } from "@react-navigation/native";
+import { ScreenStackParamList } from "../types";
 
 // Comps
-// import { Overlay } from "../components/Camera/Overlay";
 import {
   ActionsToolbar,
   FlashAnimation,
   OptionsToolbar,
   Overlay
 } from "../components/Camera";
+
+// db
+import { insertOneImage } from "../db";
+
+import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // styles
 import { styles } from "../components/Camera/styles";
@@ -21,12 +27,18 @@ import { styles } from "../components/Camera/styles";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import { orientation } from "../types";
 
+type CameraScreenRouteProp = RouteProp<ScreenStackParamList, "Camera">;
+
+type Props = {
+  route: CameraScreenRouteProp;
+};
+
 /*
  * ============================
  *  Exported Camera Component
  * ============================
  */
-export default () => {
+export default ({ route }: Props) => {
   const camera = React.createRef<Camera | null>();
 
   const [cameraPermission, setCameraPermission] = React.useState<boolean>();
@@ -101,10 +113,31 @@ export default () => {
         }, 200);
         const { uri } = await camera.current.takePictureAsync();
 
-        // save to device media library
-        const asset = await MediaLibrary.createAssetAsync(uri);
+        // first save to device media library (temporary)
+        const photo = await MediaLibrary.createAssetAsync(uri);
 
-        await MediaLibrary.createAlbumAsync("aa_TimeShift", asset, false);
+        console.log("1", { photo });
+
+        // create album and MOVE asset to album
+        const i = await MediaLibrary.createAlbumAsync(
+          LOCAL_MEDIA_ALBUM_NAME,
+          photo,
+          false
+        );
+
+        console.log("2", { i });
+
+        // get new details of moved asset
+        const { assets } = await MediaLibrary.getAssetsAsync({
+          first: 1,
+          album: i.id,
+          sortBy: ["creationTime"]
+        });
+
+        console.log("3", assets[0]);
+
+        // write to db
+        await insertOneImage(route.params.projectId, assets[0]);
       } catch (error) {
         console.log("err", error);
       }
@@ -114,13 +147,7 @@ export default () => {
   React.useEffect(() => {
     // Check / Obtain permissions on mount
     (async () => {
-      console.log("mounting");
-
       const { status: cameraStatus } = await Camera.requestPermissionsAsync();
-      // const {
-      //   status: mediaStatus
-      // } = await MediaLibrary.requestPermissionsAsync();
-
       setCameraPermission(cameraStatus === "granted");
     })();
   }, []);

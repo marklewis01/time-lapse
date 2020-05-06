@@ -24,7 +24,7 @@ const PERSISTENCE_KEY = "NAVIGATION_STATE";
 const PREFERENCES_KEY = "APP_PREFERENCES";
 
 // DB
-import { selectManyProjects, createProjectTable } from "./db";
+import { getManyProjects, createProjectTable } from "./db";
 
 // Context
 const PreferencesContext = React.createContext<any>(null);
@@ -147,7 +147,7 @@ export default function App() {
   // local db
   React.useEffect(() => {
     // check if tables exists
-    selectManyProjects()
+    getManyProjects()
       .then((projects) => {
         if (!projects.length) {
           createProjectTable();

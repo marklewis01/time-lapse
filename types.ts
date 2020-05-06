@@ -6,6 +6,13 @@ export type orientation =
   | "portrait-up"
   | "portrait-down";
 
+export interface IImage {
+  created_at: string;
+  id: number;
+  project_id: number;
+  uri: string;
+}
+
 export interface IProject {
   id: number;
   name: string;
@@ -24,7 +31,7 @@ export interface ISQLiteSelectResponse extends SQLite.SQLResultSet {
 
 export type ScreenStackParamList = {
   HomeScreen: undefined;
-  Camera: undefined;
+  Camera: { projectId: number };
   ProjectScreen: { id: number };
   TestScreen: undefined;
 };
