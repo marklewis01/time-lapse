@@ -89,7 +89,6 @@ export default function App() {
         // not certain if required, but during development, if app
         // starts with only 'Camera' in route history, going 'back'
         // throws error and user cannot escape Camera screen.
-
         const saferNavState =
           state.routes[0].state.routes.length === 0 &&
           state.routes[0].state.routes[0].name === "Camera"

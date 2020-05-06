@@ -67,6 +67,23 @@ export const resetTables = (): Promise<void> => {
  * UPDATES
  */
 
+export const updateProjectName = (id: number, name: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const date = moment().format();
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `UPDATE project SET name = ?, updated_at = ? WHERE id = ?`,
+          [name, date, id],
+          () => resolve()
+        );
+      },
+      (e) => reject(e)
+    );
+  });
+};
+
 /*
  * READ
  */

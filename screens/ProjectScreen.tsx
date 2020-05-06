@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from "react-native";
 import {
@@ -13,20 +14,28 @@ import {
   Button,
   Colors,
   Dialog,
+  Divider,
   IconButton,
   Menu,
   Portal,
-  ProgressBar
+  ProgressBar,
+  Surface,
+  TextInput
 } from "react-native-paper";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { ScreenStackParamList } from "../types";
+import * as Haptics from "expo-haptics";
 
 // db
-import { deleteProject, getOneProject, getProjectImages } from "../db";
+import {
+  deleteProject,
+  getOneProject,
+  getProjectImages,
+  updateProjectName
+} from "../db";
 
-import { IImage, IProject } from "../types";
-
+// TS
+import { IImage, IProject, ScreenStackParamList } from "../types";
 type ProjectScreenNavigationProp = StackNavigationProp<
   ScreenStackParamList,
   "ProjectScreen"
@@ -39,12 +48,16 @@ type Props = {
 };
 
 export default ({ navigation, route }: Props) => {
-  const [dialog, setDialog] = React.useState(false);
+  const [dialog, setDialog] = React.useState<"delete" | "projectName" | null>(
+    null
+  );
   const [images, setImages] = React.useState<IImage[]>([]);
   const [loadingImages, setLoadingImages] = React.useState(true);
-  const [project, setProject] = React.useState<IProject>();
-
   const [menu, setMenu] = React.useState(false);
+  const [newName, setNewName] = React.useState<string>();
+  const [project, setProject] = React.useState<IProject>();
+  const [selected, setSelected] = React.useState<number[]>([]);
+  const [selectMode, setSelectMode] = React.useState(false);
 
   const handleGetProject = async () => {
     // get from project table
@@ -62,9 +75,45 @@ export default ({ navigation, route }: Props) => {
     navigation.navigate("HomeScreen");
   };
 
-  const handleDeleteConfirmation = () => {
-    setDialog(true);
+  const handleDeleteProjectDialog = () => {
+    setDialog("delete");
     setMenu(false);
+  };
+
+  const handleEditProjectNameDialog = () => {
+    setDialog("projectName");
+    setMenu(false);
+    setNewName(project?.name);
+  };
+  const handleEditProjectName = async () => {
+    if (!newName || newName === "") return;
+
+    await updateProjectName(route.params.id, newName);
+    setDialog(null);
+  };
+
+  const handleSetSelectMode = async (id: number) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelected([id]);
+    setSelectMode(true);
+  };
+  const handleSecondImage = (id: number) => {
+    // do nothing if not in selectMode
+    if (!selectMode) return;
+
+    // only allow max array length of 2
+    if (selected.length > 2) return;
+
+    // unselect if already selected
+    if (selected.includes(id)) {
+      return setSelected((prevState) => prevState.filter((x) => x !== id));
+    }
+
+    setSelected((prevState) => prevState.concat(id));
+  };
+  const handleCancelSelectMode = () => {
+    setSelectMode(false);
+    setSelected([]);
   };
 
   const handleTakePhoto = () => {
@@ -100,12 +149,36 @@ export default ({ navigation, route }: Props) => {
           }
         >
           <Menu.Item
-            onPress={handleDeleteConfirmation}
+            onPress={handleEditProjectNameDialog}
+            title="Rename Project"
+          />
+          <Divider />
+          <Menu.Item
+            onPress={handleDeleteProjectDialog}
             title="Delete Project"
           />
         </Menu>
       </Appbar.Header>
-
+      <Surface style={styles.toolbar}>
+        {selectMode ? (
+          <View style={styles.toolbarActions}>
+            <Text style={{ marginLeft: 15 }}>
+              {selected.length + " selected"}
+            </Text>
+            {selectMode && (
+              <Button onPress={handleCancelSelectMode}>Cancel</Button>
+            )}
+          </View>
+        ) : (
+          <Button onPress={() => setSelectMode(true)}>Select Images</Button>
+        )}
+        <Button
+          disabled={selected.length < 2}
+          mode={selected.length < 2 ? "text" : "contained"}
+        >
+          Compare
+        </Button>
+      </Surface>
       <View
         style={{
           flex: 1
@@ -117,20 +190,47 @@ export default ({ navigation, route }: Props) => {
           <FlatList
             data={images}
             renderItem={({ item }) => (
-              <Image
-                key={item.id}
-                style={styles.image}
-                source={{ uri: item.uri }}
-                resizeMode="cover"
-              />
+              <TouchableOpacity
+                style={[selected.includes(item.id) && styles.isSelected]}
+                onPress={() => handleSecondImage(item.id)}
+                onLongPress={() => handleSetSelectMode(item.id)}
+              >
+                <Image
+                  key={item.id}
+                  style={styles.image}
+                  source={{ uri: item.uri }}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id.toString()}
           />
         )}
       </View>
-      {dialog && (
+      {dialog === "projectName" && (
         <Portal>
-          <Dialog visible={dialog} onDismiss={() => setDialog(false)}>
+          <Dialog visible={true} onDismiss={() => setDialog(null)}>
+            <Dialog.Title>Rename Project?</Dialog.Title>
+            <Dialog.Content>
+              <TextInput
+                label="Project Name"
+                value={newName}
+                onChangeText={(v) => setNewName(v)}
+                mode="outlined"
+              />
+            </Dialog.Content>
+            <Dialog.Actions style={{ justifyContent: "space-between" }}>
+              <Button onPress={() => setDialog(null)}>Cancel</Button>
+              <Button mode="contained" onPress={handleEditProjectName}>
+                Update
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      )}
+      {dialog === "delete" && (
+        <Portal>
+          <Dialog visible={true} onDismiss={() => setDialog(null)}>
             <Dialog.Title>Delete Project?</Dialog.Title>
             <Dialog.Content>
               <Text>
@@ -139,7 +239,7 @@ export default ({ navigation, route }: Props) => {
               </Text>
             </Dialog.Content>
             <Dialog.Actions style={{ justifyContent: "space-between" }}>
-              <Button onPress={() => setDialog(false)}>Cancel</Button>
+              <Button onPress={() => setDialog(null)}>Cancel</Button>
               <Button
                 mode="contained"
                 onPress={handleDeleteProject}
@@ -173,5 +273,23 @@ const styles = StyleSheet.create({
   image: {
     width: 100,
     height: 100
+  },
+  isSelected: {
+    borderWidth: 2,
+    borderColor: "red"
+  },
+  toSelect: {
+    borderWidth: 1,
+    borderColor: "grey"
+  },
+  toolbar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 10
+  },
+  toolbarActions: {
+    flexDirection: "row",
+    alignItems: "center"
   }
 });

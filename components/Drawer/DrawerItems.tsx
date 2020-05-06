@@ -25,7 +25,7 @@ interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
 
 const DrawerItemsData = [
   { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 },
-  { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
+  // { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
   {
     label: "Test Screen",
     icon: "test-tube",
@@ -36,7 +36,7 @@ const DrawerItemsData = [
 
 const DrawerItems = ({
   toggleTheme,
-  toggleRTL,
+  // toggleRTL,
   isRTL,
   isDarkTheme,
   navigation
@@ -89,22 +89,23 @@ const DrawerItems = ({
         {/* </TouchableRipple> */}
       </Drawer.Section>
 
+      <Drawer.Section>
+        <TouchableRipple onPress={() => handleReset()}>
+          <View style={styles.preference}>
+            <Text>Factory Reset</Text>
+          </View>
+        </TouchableRipple>
+      </Drawer.Section>
+
       <View style={styles.logoutSection}>
         <Button
-          mode="contained"
-          style={styles.logoutButton}
-          onPress={handleReset}
-        >
-          Reset App
-        </Button>
-        {/* <Button
           mode="contained"
           icon="logout"
           style={styles.logoutButton}
           onPress={handleLogout}
         >
           Logout
-        </Button> */}
+        </Button>
       </View>
     </View>
   );
