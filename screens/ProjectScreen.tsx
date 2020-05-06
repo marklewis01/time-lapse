@@ -1,6 +1,25 @@
 import * as React from "react";
-import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { Appbar, Button, ProgressBar } from "react-native-paper";
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  findNodeHandle
+} from "react-native";
+import {
+  ActivityIndicator,
+  Appbar,
+  Button,
+  Colors,
+  Dialog,
+  IconButton,
+  Menu,
+  Portal,
+  ProgressBar,
+  Provider
+} from "react-native-paper";
 import moment from "moment";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -23,8 +42,13 @@ type Props = {
 };
 
 export default ({ navigation, route }: Props) => {
-  const [project, setProject] = React.useState<IProject>();
+  const [dialog, setDialog] = React.useState(false);
   const [images, setImages] = React.useState<IImage[]>([]);
+  const [loadingImages, setLoadingImages] = React.useState(true);
+  const [project, setProject] = React.useState<IProject>();
+
+  const [menu, setMenu] = React.useState(false);
+  const touchableRef = React.createRef();
 
   const handleGetProject = async () => {
     // get from project table
@@ -34,10 +58,17 @@ export default ({ navigation, route }: Props) => {
     // get associated images
     const images = await getProjectImages(route.params.id, "ASC");
     setImages(images);
+    setLoadingImages(false);
   };
 
   const handleDeleteProject = async () => {
     deleteProject(route.params.id);
+    navigation.navigate("HomeScreen");
+  };
+
+  const handleDeleteConfirmation = () => {
+    setDialog(true);
+    setMenu(false);
   };
 
   const handleTakePhoto = () => {
@@ -52,8 +83,6 @@ export default ({ navigation, route }: Props) => {
     handleGetProject();
   }, []);
 
-  console.log({ images });
-
   return project ? (
     <SafeAreaView style={styles.container}>
       <Appbar.Header>
@@ -62,6 +91,23 @@ export default ({ navigation, route }: Props) => {
           onPress={() => navigation.goBack()}
         />
         <Appbar.Content title={project.name} subtitle="" />
+        <Menu
+          visible={menu}
+          onDismiss={() => setMenu(false)}
+          anchor={
+            <IconButton
+              icon="dots-vertical"
+              color="white"
+              size={20}
+              onPress={() => setMenu(true)}
+            />
+          }
+        >
+          <Menu.Item
+            onPress={handleDeleteConfirmation}
+            title="Delete Project"
+          />
+        </Menu>
       </Appbar.Header>
       <View
         style={{
@@ -76,29 +122,57 @@ export default ({ navigation, route }: Props) => {
       </View>
       <View
         style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          borderWidth: 5,
-          borderColor: "red"
+          flex: 1
         }}
       >
-        {images.map((image) => (
-          <Image
-            key={image.id}
-            style={styles.image}
-            source={{ uri: image.uri }}
-            resizeMode="cover"
+        {loadingImages ? (
+          <ProgressBar />
+        ) : (
+          <FlatList
+            data={images}
+            renderItem={({ item }) => (
+              <Image
+                key={item.id}
+                style={styles.image}
+                source={{ uri: item.uri }}
+                resizeMode="cover"
+              />
+            )}
+            keyExtractor={(item) => item.id.toString()}
           />
-        ))}
+        )}
       </View>
+      {dialog && (
+        <Portal>
+          <Dialog visible={dialog} onDismiss={() => setDialog(false)}>
+            <Dialog.Title>Delete Project?</Dialog.Title>
+            <Dialog.Content>
+              <Text>
+                Are you sure you want to delete this project? This cannot be
+                undone.
+              </Text>
+            </Dialog.Content>
+            <Dialog.Actions style={{ justifyContent: "space-between" }}>
+              <Button onPress={() => setDialog(false)}>Cancel</Button>
+              <Button
+                mode="contained"
+                onPress={handleDeleteProject}
+                color={Colors.red800}
+              >
+                Delete
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      )}
+
+      <Appbar style={styles.bottomAppBar}>
+        <Appbar.Action icon="delete" onPress={() => console.log("delete")} />
+      </Appbar>
     </SafeAreaView>
   ) : (
     <React.Fragment>
-      <ProgressBar indeterminate />
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>loading project...</Text>
-      </View>
+      <ActivityIndicator animating={true} />
     </React.Fragment>
   );
 };
@@ -107,6 +181,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
+  bottomAppBar: {},
   image: {
     width: 100,
     height: 100

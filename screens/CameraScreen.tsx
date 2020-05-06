@@ -5,7 +5,6 @@ import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
 import { DeviceMotion } from "expo-sensors";
 import { RouteProp } from "@react-navigation/native";
-import { ScreenStackParamList } from "../types";
 
 // Comps
 import {
@@ -25,7 +24,7 @@ import { styles } from "../components/Camera/styles";
 
 // Types
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
-import { orientation } from "../types";
+import { orientation, ScreenStackParamList } from "../types";
 
 type CameraScreenRouteProp = RouteProp<ScreenStackParamList, "Camera">;
 
