@@ -5,6 +5,22 @@ const db = SQLite.openDatabase("db.db");
 
 import { ISQLiteSelectResponse } from "../types";
 
+const createProjectTableQuery = `CREATE TABLE IF NOT EXISTS project (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );`;
+
+const createImageTableQuery = `CREATE TABLE IF NOT EXISTS image (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          project_id INTEGER NOT NULL,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (project_id)
+            REFERENCES project (id)
+        );`;
+
 /*
  * DELETES
  */
@@ -22,6 +38,27 @@ export const deleteProject = (id: number): Promise<void> => {
       (err) => reject(err),
       () => resolve()
     );
+  });
+};
+
+export const resetTables = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log("recreating tables");
+      db.transaction(
+        (tx) => {
+          tx.executeSql(`DROP TABLE IF EXISTS project`);
+          tx.executeSql("DROP TABLE IF EXISTS image");
+          tx.executeSql(createProjectTableQuery, []);
+          tx.executeSql(createImageTableQuery, []);
+        },
+        (e) => console.error(e),
+        () => resolve()
+      );
+    } catch (err) {
+      console.error(err);
+      reject(err);
+    }
   });
 };
 
@@ -98,17 +135,17 @@ export const addProject = (name: string) => {
 export const createProjectTable = () => {
   db.transaction(
     (tx) => {
-      // tx.executeSql(`DROP TABLE IF EXISTS project`);
+      tx.executeSql(createProjectTableQuery, []);
+    },
+    (err) => console.error(err)
+  );
+};
 
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS project (
-          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-          name TEXT,
-          created_at TEXT,
-          updated_at TEXT
-        );`,
-        []
-      );
+//Tables
+export const createImagesTable = () => {
+  db.transaction(
+    (tx) => {
+      tx.executeSql(createImageTableQuery, []);
     },
     (err) => console.error(err)
   );

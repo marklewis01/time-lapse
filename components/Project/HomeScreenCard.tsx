@@ -17,14 +17,17 @@ export const ProjectCard = ({ project }: { project: IProject }) => {
     console.log("deleted", id);
   };
 
+  const handlePress = () =>
+    navigation.navigate("ProjectScreen", { ...project });
+
   return (
-    <Card onPress={() => navigation.navigate("ProjectScreen", { ...project })}>
+    <Card onPress={handlePress}>
       <Card.Title
         title={project.name}
         subtitle={`Updated: ${moment(project.updated_at).fromNow()}`}
         left={(props) => <Avatar.Icon {...props} icon="folder" />}
         right={(props) => (
-          <IconButton {...props} icon="chevron-right" onPress={() => {}} />
+          <IconButton {...props} icon="chevron-right" onPress={handlePress} />
         )}
       />
     </Card>

@@ -5,7 +5,6 @@ import {
   Switch,
   TouchableRipple,
   Text,
-  Colors,
   useTheme,
   Button
 } from "react-native-paper";
@@ -14,6 +13,8 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions
 } from "@react-navigation/drawer";
+
+import { resetTables } from "../../db";
 
 interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
   toggleTheme: () => void;
@@ -42,6 +43,17 @@ const DrawerItems = ({
 }: Props) => {
   const { colors } = useTheme();
   const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
+
+  const handleReset = () => {
+    console.log("reset pressed");
+    return resetTables()
+      .then(() => console.log("Reset successfully"))
+      .catch((e) => console.error(e));
+  };
+
+  const handleLogout = () => {
+    console.log("logout pressed");
+  };
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
@@ -81,12 +93,19 @@ const DrawerItems = ({
       <View style={styles.logoutSection}>
         <Button
           mode="contained"
+          style={styles.logoutButton}
+          onPress={handleReset}
+        >
+          Reset App
+        </Button>
+        {/* <Button
+          mode="contained"
           icon="logout"
           style={styles.logoutButton}
-          onPress={() => console.log("logout pressed")}
+          onPress={handleLogout}
         >
           Logout
-        </Button>
+        </Button> */}
       </View>
     </View>
   );
