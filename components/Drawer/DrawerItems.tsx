@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { BackHandler, Platform, StyleSheet, View } from "react-native";
 import {
   Drawer,
   Switch,
@@ -24,19 +24,19 @@ interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
 }
 
 const DrawerItemsData = [
-  { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 },
+  { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 }
   // { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
-  {
-    label: "Test Screen",
-    icon: "test-tube",
-    navigation: "TestScreen",
-    key: 2
-  }
+  // {
+  //   label: "Test Screen",
+  //   icon: "test-tube",
+  //   navigation: "TestScreen",
+  //   key: 2
+  // }
 ];
 
 const DrawerItems = ({
   toggleTheme,
-  // toggleRTL,
+  toggleRTL,
   isRTL,
   isDarkTheme,
   navigation
@@ -61,7 +61,7 @@ const DrawerItems = ({
           <Drawer.Item
             {...props}
             key={index}
-            active={drawerItemIndex === index}
+            // active={drawerItemIndex === index}
             onPress={() => {
               setDrawerItemIndex(index);
               navigation.navigate(props.navigation);
@@ -79,32 +79,32 @@ const DrawerItems = ({
             </View>
           </View>
         </TouchableRipple>
-        {/* <TouchableRipple onPress={toggleRTL}> */}
-        <View style={styles.preference}>
-          <Text>RTL</Text>
-          <View pointerEvents="none">
-            <Switch value={isRTL} />
+        <TouchableRipple onPress={toggleRTL}>
+          <View style={styles.preference}>
+            <Text>RTL</Text>
+            <View pointerEvents="none">
+              <Switch value={isRTL} />
+            </View>
           </View>
-        </View>
-        {/* </TouchableRipple> */}
+        </TouchableRipple>
       </Drawer.Section>
 
-      <Drawer.Section>
+      {/* <Drawer.Section>
         <TouchableRipple onPress={() => handleReset()}>
           <View style={styles.preference}>
             <Text>Factory Reset</Text>
           </View>
         </TouchableRipple>
-      </Drawer.Section>
+      </Drawer.Section> */}
 
       <View style={styles.logoutSection}>
         <Button
           mode="contained"
           icon="logout"
           style={styles.logoutButton}
-          onPress={handleLogout}
+          onPress={() => BackHandler.exitApp()}
         >
-          Logout
+          Exit
         </Button>
       </View>
     </View>
