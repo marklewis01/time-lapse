@@ -55,12 +55,6 @@ export default function HomeScreen() {
  * ================================
  */
 
-function wait(timeout: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
-}
-
 const Home = () => {
   const navigation = useNavigation<any>();
 
