@@ -95,9 +95,6 @@ const Home = () => {
 
   React.useEffect(() => {
     (async () => {
-      // on load, check to see if any projects
-      await handleGetProjects();
-
       // Check / Obtain permissions on mount
       const {
         status: mediaStatus
@@ -105,7 +102,14 @@ const Home = () => {
 
       setCameraRollPermission(mediaStatus === "granted");
     })();
-  }, []);
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      // The screen is focused
+      handleGetProjects();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return cameraRollPermission === undefined ? (
     <View />

@@ -14,7 +14,6 @@ export const ProjectCard = ({ project }: { project: IProject }) => {
 
   const handleDelete = async (id: number) => {
     await deleteProject(id);
-    console.log("deleted", id);
   };
 
   const handlePress = () =>

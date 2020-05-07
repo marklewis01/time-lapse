@@ -136,14 +136,17 @@ export default ({ navigation, route }: Props) => {
   const handleTakePhoto = () => {
     if (!project) return; // TODO: make Snack for error message
 
-    console.log("photo time");
     navigation.navigate("Camera", { projectId: project.id });
   };
 
   React.useEffect(() => {
-    // lookup project details
-    handleGetProject();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      // lookup project details
+      handleGetProject();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return project ? (
     <SafeAreaView style={styles.container}>
@@ -214,7 +217,8 @@ export default ({ navigation, route }: Props) => {
                 style={[
                   {
                     flex: 1,
-                    margin: IMAGE_PADDING
+                    margin: IMAGE_PADDING,
+                    maxWidth: imageWidth
                   }
                 ]}
                 onPress={() => handleSecondImage(item.id)}
@@ -227,6 +231,7 @@ export default ({ navigation, route }: Props) => {
                       height: imageWidth,
                       width: imageWidth
                     },
+                    selectMode && styles.toSelect,
                     selected.includes(item.id) && styles.isSelected,
                     selected.length >= 2 &&
                       !selected.includes(item.id) &&
@@ -319,7 +324,7 @@ const styles = StyleSheet.create({
   },
   toSelect: {
     borderWidth: 4,
-    borderColor: "grey"
+    borderColor: "lightgrey"
   },
   toolbar: {
     flexDirection: "row",

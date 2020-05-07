@@ -92,7 +92,6 @@ export default ({ route }: Props) => {
     // on click, if selected, set state
     const result = await ImagePicker.launchImageLibraryAsync();
 
-    console.log({ result });
     if (!result.cancelled) {
       // get size of overlay image, update camera aspect if required
 
@@ -115,16 +114,12 @@ export default ({ route }: Props) => {
         // first save to device media library (temporary)
         const photo = await MediaLibrary.createAssetAsync(uri);
 
-        console.log("1", { photo });
-
         // create album and MOVE asset to album
         const i = await MediaLibrary.createAlbumAsync(
           LOCAL_MEDIA_ALBUM_NAME,
           photo,
           false
         );
-
-        console.log("2", { i });
 
         // get new details of moved asset
         const { assets } = await MediaLibrary.getAssetsAsync({
@@ -133,12 +128,10 @@ export default ({ route }: Props) => {
           sortBy: ["creationTime"]
         });
 
-        console.log("3", assets[0]);
-
         // write to db
         await insertOneImage(route.params.projectId, assets[0]);
       } catch (error) {
-        console.log("err", error);
+        console.error("err", error);
       }
     }
   };
@@ -172,7 +165,6 @@ export default ({ route }: Props) => {
         return () => DeviceMotion.removeAllListeners();
       } else {
         // no device motion. Do nothing.
-        console.log("no dm");
       }
     })();
   }, []);
