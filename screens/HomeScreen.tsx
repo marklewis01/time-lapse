@@ -17,6 +17,7 @@ import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // Screens
 import CameraScreen from "./CameraScreen";
+import CompareScreen from "./CompareScreen";
 import ProjectScreen from "./ProjectScreen";
 import TestScreen from "./TestScreen";
 
@@ -41,6 +42,7 @@ export default function HomeScreen() {
     >
       <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen name="CompareScreen" component={CompareScreen} />
       <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
       <Stack.Screen name="TestScreen" component={TestScreen} />
     </Stack.Navigator>

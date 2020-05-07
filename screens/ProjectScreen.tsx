@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Dimensions,
   FlatList,
   Image,
   SafeAreaView,
@@ -47,6 +48,13 @@ type Props = {
   route: ProjectScreenRouteProp;
 };
 
+const IMAGES_PER_ROW = 3;
+const IMAGE_PADDING = 5;
+
+const windowWidth = Dimensions.get("window").width;
+const imageWidth =
+  (windowWidth - 2 * IMAGE_PADDING * IMAGES_PER_ROW) / IMAGES_PER_ROW;
+
 export default ({ navigation, route }: Props) => {
   const [dialog, setDialog] = React.useState<"delete" | "projectName" | null>(
     null
@@ -92,22 +100,31 @@ export default ({ navigation, route }: Props) => {
     setDialog(null);
   };
 
+  const handleGoToCompareScreen = () => {
+    // get uri's. Will return array of URI's, chronologically ordered (due to filter on ID)
+    const selectedImages = images
+      .filter((image) => selected.includes(image.id))
+      .map((obj) => obj.uri);
+
+    navigation.navigate("CompareScreen", { images: selectedImages });
+  };
+
   const handleSetSelectMode = async (id: number) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelected([id]);
+    setSelected((prevState) => prevState.concat(id));
     setSelectMode(true);
   };
   const handleSecondImage = (id: number) => {
     // do nothing if not in selectMode
     if (!selectMode) return;
 
-    // only allow max array length of 2
-    if (selected.length > 2) return;
-
     // unselect if already selected
     if (selected.includes(id)) {
       return setSelected((prevState) => prevState.filter((x) => x !== id));
     }
+
+    // only allow max array length of 2
+    if (selected.length >= 2) return;
 
     setSelected((prevState) => prevState.concat(id));
   };
@@ -175,12 +192,15 @@ export default ({ navigation, route }: Props) => {
         <Button
           disabled={selected.length < 2}
           mode={selected.length < 2 ? "text" : "contained"}
+          onPress={handleGoToCompareScreen}
         >
           Compare
         </Button>
       </Surface>
+
       <View
         style={{
+          justifyContent: "center",
           flex: 1
         }}
       >
@@ -191,19 +211,34 @@ export default ({ navigation, route }: Props) => {
             data={images}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={[selected.includes(item.id) && styles.isSelected]}
+                style={[
+                  {
+                    flex: 1,
+                    margin: IMAGE_PADDING
+                  }
+                ]}
                 onPress={() => handleSecondImage(item.id)}
                 onLongPress={() => handleSetSelectMode(item.id)}
+                disabled={selected.length >= 2 && !selected.includes(item.id)}
               >
                 <Image
-                  key={item.id}
-                  style={styles.image}
+                  style={[
+                    {
+                      height: imageWidth,
+                      width: imageWidth
+                    },
+                    selected.includes(item.id) && styles.isSelected,
+                    selected.length >= 2 &&
+                      !selected.includes(item.id) &&
+                      styles.cannotSelect
+                  ]}
                   source={{ uri: item.uri }}
                   resizeMode="cover"
                 />
               </TouchableOpacity>
             )}
-            keyExtractor={(item) => item.id.toString()}
+            numColumns={IMAGES_PER_ROW}
+            keyExtractor={(item) => (item.id * IMAGES_PER_ROW).toString()}
           />
         )}
       </View>
@@ -271,15 +306,19 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   image: {
-    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
     height: 100
   },
+  cannotSelect: {
+    opacity: 0.5
+  },
   isSelected: {
-    borderWidth: 2,
+    borderWidth: 4,
     borderColor: "red"
   },
   toSelect: {
-    borderWidth: 1,
+    borderWidth: 4,
     borderColor: "grey"
   },
   toolbar: {

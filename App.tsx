@@ -32,21 +32,20 @@ const PreferencesContext = React.createContext<any>(null);
 // Drawer
 const DrawerContent = (
   props: DrawerContentComponentProps<DrawerContentOptions>
-) => {
-  return (
-    <PreferencesContext.Consumer>
-      {(preferences) => (
-        <DrawerItems
-          toggleTheme={preferences.toggleTheme}
-          toggleRTL={preferences.toggleRtl}
-          isRTL={preferences.rtl}
-          isDarkTheme={preferences.theme === customDarkTheme}
-          {...props}
-        />
-      )}
-    </PreferencesContext.Consumer>
-  );
-};
+) => (
+  <PreferencesContext.Consumer>
+    {(preferences) => (
+      <DrawerItems
+        toggleTheme={preferences.toggleTheme}
+        toggleRTL={preferences.toggleRtl}
+        isRTL={preferences.rtl}
+        isDarkTheme={preferences.theme === customDarkTheme}
+        {...props}
+      />
+    )}
+  </PreferencesContext.Consumer>
+);
+
 const Drawer = createDrawerNavigator<{ Home: undefined }>();
 
 const customDefaultTheme = {
@@ -199,7 +198,10 @@ export default function App() {
             AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
           }
         >
-          <Drawer.Navigator drawerContent={DrawerContent}>
+          <Drawer.Navigator
+            drawerContent={DrawerContent}
+            initialRouteName="Home"
+          >
             <Drawer.Screen name="Home" component={HomeScreen} />
           </Drawer.Navigator>
         </NavigationContainer>
