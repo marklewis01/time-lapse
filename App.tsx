@@ -156,20 +156,33 @@ export default function App() {
 
   // local db
   React.useEffect(() => {
-    // check if tables exists
-    getManyProjects()
-      .then((projects) => {
+    (async () => {
+      try {
+        // check if tables exists
+        const projects = await getManyProjects();
+
         if (!projects.length) {
-          createProjectTable();
+          await createProjectTable();
         }
-      })
-      .catch((e) => {
-        try {
-          createProjectTable();
-        } catch (err) {
-          console.error(err);
-        }
-      });
+      } catch (e) {
+        await createProjectTable();
+      }
+    })();
+
+    // // check if tables exists
+    // getManyProjects()
+    //   .then((projects) => {
+    //     if (!projects.length) {
+    //       createProjectTable();
+    //     }
+    //   })
+    //   .catch((e) => {
+    //     try {
+    //       createProjectTable();
+    //     } catch (err) {
+    //       console.error(err);
+    //     }
+    //   });
   }, []);
 
   const preferences = React.useMemo(

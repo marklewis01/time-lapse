@@ -6,7 +6,6 @@ import {
   Image,
   SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View
 } from "react-native";
@@ -14,6 +13,7 @@ import {
   ActivityIndicator,
   Appbar,
   Button,
+  Checkbox,
   Colors,
   Dialog,
   Divider,
@@ -22,6 +22,7 @@ import {
   Portal,
   ProgressBar,
   Surface,
+  Text,
   TextInput
 } from "react-native-paper";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
@@ -61,7 +62,9 @@ export default ({ navigation, route }: Props) => {
   const [dialog, setDialog] = React.useState<"delete" | "projectName" | null>(
     null
   );
+  const [deleteLocalImages, setDeleteLocalImages] = React.useState(false);
   const [images, setImages] = React.useState<IImage[]>([]);
+  const [loading, setLoading] = React.useState(false);
   const [loadingImages, setLoadingImages] = React.useState(true);
   const [menu, setMenu] = React.useState(false);
   const [newName, setNewName] = React.useState<string>();
@@ -81,12 +84,23 @@ export default ({ navigation, route }: Props) => {
   };
 
   const handleDeleteProject = async () => {
-    deleteProject(route.params.id);
+    setLoading(true);
+
+    if (deleteLocalImages) {
+      const deleted: boolean = await MediaLibrary.deleteAssetsAsync(
+        images.map((i) => i.asset_id)
+      );
+      // TODO: handle if delete = false (ie error)
+    }
+
+    await deleteProject(route.params.id);
+
     navigation.navigate("HomeScreen");
   };
 
   const handleDeleteProjectDialog = () => {
     setDialog("delete");
+    setDeleteLocalImages(false);
     setMenu(false);
   };
 
@@ -300,20 +314,44 @@ export default ({ navigation, route }: Props) => {
       )}
       {dialog === "delete" && (
         <Portal>
-          <Dialog visible={true} onDismiss={() => setDialog(null)}>
+          <Dialog
+            visible={true}
+            onDismiss={() => setDialog(null)}
+            dismissable={!loading}
+          >
             <Dialog.Title>Delete Project?</Dialog.Title>
             <Dialog.Content>
               <Text>
                 Are you sure you want to delete this project? This cannot be
                 undone.
               </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginVertical: 10
+                }}
+              >
+                <Checkbox
+                  status={deleteLocalImages ? "checked" : "unchecked"}
+                  onPress={() =>
+                    setDeleteLocalImages((prevState) => !prevState)
+                  }
+                  disabled={loading}
+                />
+                <Text>Delete images from device?</Text>
+              </View>
             </Dialog.Content>
             <Dialog.Actions style={{ justifyContent: "space-between" }}>
-              <Button onPress={() => setDialog(null)}>Cancel</Button>
+              <Button onPress={() => setDialog(null)} disabled={loading}>
+                Cancel
+              </Button>
               <Button
                 mode="contained"
                 onPress={handleDeleteProject}
                 color={Colors.red800}
+                loading={loading}
+                disabled={loading}
               >
                 Delete
               </Button>

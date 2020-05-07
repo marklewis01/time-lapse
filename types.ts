@@ -11,6 +11,7 @@ export interface IImage {
   id: number;
   project_id: number;
   uri: string;
+  asset_id: string;
 }
 
 export interface IProject {

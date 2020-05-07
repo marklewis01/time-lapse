@@ -4,6 +4,11 @@ import { Asset } from "expo-media-library";
 
 const db = SQLite.openDatabase("db.db");
 
+// required to enable foreign key support
+db.exec([{ sql: "PRAGMA foreign_keys = ON;", args: [] }], false, () => {
+  // console.log("Foreign keys turned on")
+});
+
 import { ISQLiteSelectResponse, IImage, IProject } from "../types";
 
 const createProjectTableQuery = `CREATE TABLE IF NOT EXISTS project (
@@ -16,10 +21,9 @@ const createProjectTableQuery = `CREATE TABLE IF NOT EXISTS project (
 const createImageTableQuery = `CREATE TABLE IF NOT EXISTS image (
           id INTEGER PRIMARY KEY,
           uri TEXT NOT NULL,
-          project_id INTEGER NOT NULL,
+          project_id INTEGER REFERENCES project(id) ON DELETE CASCADE,
           created_at TEXT NOT NULL,
-          FOREIGN KEY (project_id)
-            REFERENCES project (id)
+          asset_id TEXT NOT NULL
         );`;
 
 /*
@@ -42,25 +46,31 @@ export const deleteProject = (id: number): Promise<void> => {
   });
 };
 
-export const resetTables = (): Promise<void> => {
+function deleteAllTables() {
   return new Promise((resolve, reject) => {
-    try {
-      console.log("recreating tables");
-      db.transaction(
-        (tx) => {
-          tx.executeSql(`DROP TABLE IF EXISTS project`);
-          tx.executeSql("DROP TABLE IF EXISTS image");
-          tx.executeSql(createProjectTableQuery, []);
-          tx.executeSql(createImageTableQuery, []);
-        },
-        (e) => console.error(e),
-        () => resolve()
-      );
-    } catch (err) {
-      console.error(err);
-      reject(err);
-    }
+    db.transaction(
+      (tx) => {
+        tx.executeSql(`DROP TABLE IF EXISTS project`);
+        tx.executeSql("DROP TABLE IF EXISTS image");
+      },
+      (e) => reject(e),
+      () => resolve()
+    );
   });
+}
+
+export const resetTables = async () => {
+  // return new Promise((resolve, reject) => {
+  try {
+    // delete existing tables
+    await deleteAllTables();
+
+    // create fresh tables
+    await createProjectTable();
+    await createImagesTable();
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 /*
@@ -178,8 +188,8 @@ export const insertOneImage = (projectId: number, image: Asset) => {
       (tx) => {
         tx.executeSql(
           // insert details into image table
-          `INSERT INTO image (uri, project_id, created_at) VALUES (?,?,?)`,
-          [image.uri, projectId, date],
+          `INSERT INTO image (uri, project_id, created_at, asset_id) VALUES (?,?,?,?)`,
+          [image.uri, projectId, date, image.id],
           (_, response) => {
             resolve(response.insertId);
           }
@@ -197,18 +207,25 @@ export const insertOneImage = (projectId: number, image: Asset) => {
 
 //Tables
 export const createProjectTable = () => {
-  db.transaction(
-    (tx) => {
-      tx.executeSql(createProjectTableQuery, []);
-    },
-    (err) => console.error(err)
-  );
+  return new Promise((resolve, reject) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(createProjectTableQuery, []);
+      },
+      (err) => reject(err),
+      () => resolve()
+    );
+  });
 };
+
 export const createImagesTable = () => {
-  db.transaction(
-    (tx) => {
-      tx.executeSql(createImageTableQuery, []);
-    },
-    (err) => console.error(err)
-  );
+  return new Promise((resolve, reject) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(createImageTableQuery, []);
+      },
+      (err) => reject(err),
+      () => resolve()
+    );
+  });
 };
