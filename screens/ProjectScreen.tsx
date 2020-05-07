@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  BackHandler,
   Dimensions,
   FlatList,
   Image,
@@ -23,8 +24,9 @@ import {
   Surface,
   TextInput
 } from "react-native-paper";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import * as MediaLibrary from "expo-media-library";
 import * as Haptics from "expo-haptics";
 
 // db
@@ -140,13 +142,38 @@ export default ({ navigation, route }: Props) => {
   };
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // lookup project details
-      handleGetProject();
+    // initial load
+    handleGetProject();
+
+    // add listeners on screen focus
+    navigation.addListener("focus", () => {
+      // add listener for file changes
+      MediaLibrary.addListener(() => {
+        handleGetProject();
+      });
     });
 
-    return unsubscribe;
+    // unsubscribe
+    return () => MediaLibrary.removeAllListeners();
   }, [navigation]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (selectMode) {
+          handleCancelSelectMode();
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [selectMode])
+  );
 
   return project ? (
     <SafeAreaView style={styles.container}>
@@ -244,9 +271,12 @@ export default ({ navigation, route }: Props) => {
             )}
             numColumns={IMAGES_PER_ROW}
             keyExtractor={(item) => (item.id * IMAGES_PER_ROW).toString()}
+            ListFooterComponent={<View />}
+            ListFooterComponentStyle={{ marginBottom: 30 }}
           />
         )}
       </View>
+
       {dialog === "projectName" && (
         <Portal>
           <Dialog visible={true} onDismiss={() => setDialog(null)}>
