@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   isSelected: {
     borderWidth: 4,
-    borderColor: "red"
+    borderColor: "#F1C808"
   },
   toSelect: {
     borderWidth: 4,

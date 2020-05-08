@@ -52,8 +52,8 @@ const customDefaultTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: Colors.green700,
-    accent: Colors.lime600
+    primary: "#F1A208",
+    accent: "#F1C808"
   }
 };
 
@@ -61,8 +61,8 @@ const customDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    primary: Colors.green400,
-    accent: Colors.lime900
+    primary: "#BD7200",
+    accent: "#FCBB3C"
   }
 };
 
@@ -168,21 +168,6 @@ export default function App() {
         await createProjectTable();
       }
     })();
-
-    // // check if tables exists
-    // getManyProjects()
-    //   .then((projects) => {
-    //     if (!projects.length) {
-    //       createProjectTable();
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     try {
-    //       createProjectTable();
-    //     } catch (err) {
-    //       console.error(err);
-    //     }
-    //   });
   }, []);
 
   const preferences = React.useMemo(

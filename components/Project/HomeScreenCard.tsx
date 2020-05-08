@@ -20,7 +20,7 @@ export const ProjectCard = ({ project }: { project: IProject }) => {
     navigation.navigate("ProjectScreen", { ...project });
 
   return (
-    <Card onPress={handlePress}>
+    <Card onPress={handlePress} style={{ borderRadius: 0 }}>
       <Card.Title
         title={project.name}
         subtitle={`Updated: ${moment(project.updated_at).fromNow()}`}
