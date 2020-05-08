@@ -24,7 +24,7 @@ const PERSISTENCE_KEY = "NAVIGATION_STATE";
 const PREFERENCES_KEY = "APP_PREFERENCES";
 
 // DB
-import { getManyProjects, createProjectTable } from "./db";
+import { getManyProjects, createProjectTable, createImagesTable } from "./db";
 
 // Context
 const PreferencesContext = React.createContext<any>(null);
@@ -163,9 +163,11 @@ export default function App() {
 
         if (!projects.length) {
           await createProjectTable();
+          await createImagesTable();
         }
       } catch (e) {
         await createProjectTable();
+        await createImagesTable();
       }
     })();
   }, []);
