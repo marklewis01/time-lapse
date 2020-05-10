@@ -1,7 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { Camera } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
 import { DeviceMotion } from "expo-sensors";
 import { RouteProp } from "@react-navigation/native";
@@ -17,7 +16,8 @@ import {
 // db
 import { insertOneImage } from "../db";
 
-import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
+// utils
+import { saveImageToAlbum } from "../utils";
 
 // styles
 import { styles } from "../components/Camera/styles";
@@ -94,7 +94,6 @@ export default ({ route }: Props) => {
 
     if (!result.cancelled) {
       // get size of overlay image, update camera aspect if required
-
       setOverlay(result);
     }
 
@@ -111,22 +110,7 @@ export default ({ route }: Props) => {
         }, 200);
         const { uri } = await camera.current.takePictureAsync();
 
-        // first save to device media library (temporary)
-        const photo = await MediaLibrary.createAssetAsync(uri);
-
-        // create album and MOVE asset to album
-        const i = await MediaLibrary.createAlbumAsync(
-          LOCAL_MEDIA_ALBUM_NAME,
-          photo,
-          false
-        );
-
-        // get new details of moved asset
-        const { assets } = await MediaLibrary.getAssetsAsync({
-          first: 1,
-          album: i.id,
-          sortBy: ["creationTime"]
-        });
+        const assets = await saveImageToAlbum(uri);
 
         // write to db
         await insertOneImage(route.params.projectId, assets[0]);

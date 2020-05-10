@@ -1,12 +1,14 @@
 import React from "react";
-import { AsyncStorage, I18nManager } from "react-native";
+import { AsyncStorage, I18nManager, Image, Text, View } from "react-native";
 import { Updates } from "expo";
 import {
+  Button,
   DarkTheme,
   DefaultTheme,
+  Dialog,
+  Portal,
   Provider as PaperProvider,
-  Theme,
-  Colors
+  Theme
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
 import {
@@ -19,23 +21,33 @@ import {
 import HomeScreen from "./screens/HomeScreen";
 import DrawerItems from "./components/Drawer/DrawerItems";
 
-// Local Storage Settings
-const PERSISTENCE_KEY = "NAVIGATION_STATE";
-const PREFERENCES_KEY = "APP_PREFERENCES";
-
 // DB
-import { getManyProjects, createProjectTable, createImagesTable } from "./db";
+import {
+  getManyProjects,
+  createProjectTable,
+  createImagesTable,
+  resetTables
+} from "./db";
+
+// TS
+import { RootDialog, HandleRootDialog } from "./types";
 
 // Context
 const PreferencesContext = React.createContext<any>(null);
 
+import logo from "./assets/icon.png";
+
+interface DrawerContentProps
+  extends DrawerContentComponentProps<DrawerContentOptions> {
+  handleDialog: HandleRootDialog;
+}
+
 // Drawer
-const DrawerContent = (
-  props: DrawerContentComponentProps<DrawerContentOptions>
-) => (
+const DrawerContent = (props: DrawerContentProps) => (
   <PreferencesContext.Consumer>
     {(preferences) => (
       <DrawerItems
+        handleDialog={props.handleDialog}
         toggleTheme={preferences.toggleTheme}
         toggleRTL={preferences.toggleRtl}
         isRTL={preferences.rtl}
@@ -45,8 +57,11 @@ const DrawerContent = (
     )}
   </PreferencesContext.Consumer>
 );
-
 const Drawer = createDrawerNavigator<{ Home: undefined }>();
+
+// Local Storage Settings
+const PERSISTENCE_KEY = "NAVIGATION_STATE";
+const PREFERENCES_KEY = "APP_PREFERENCES";
 
 const customDefaultTheme = {
   ...DefaultTheme,
@@ -68,13 +83,17 @@ const customDarkTheme = {
 
 // App
 export default function App() {
+  const [dialog, setDialog] = React.useState<RootDialog>();
   const [isReady, setIsReady] = React.useState(false);
   const [initialState, setInitialState] = React.useState<
     InitialState | undefined
   >();
-
-  const [theme, setTheme] = React.useState<Theme>(customDefaultTheme);
   const [rtl, setRtl] = React.useState<boolean>(I18nManager.isRTL);
+  const [theme, setTheme] = React.useState<Theme>(customDefaultTheme);
+
+  const handleDialog: HandleRootDialog = (s) => {
+    setDialog(s);
+  };
 
   React.useEffect(() => {
     const restoreState = async () => {
@@ -199,13 +218,54 @@ export default function App() {
           }
         >
           <Drawer.Navigator
-            drawerContent={DrawerContent}
+            drawerContent={(props) => DrawerContent({ handleDialog, ...props })}
             initialRouteName="Home"
           >
             <Drawer.Screen name="Home" component={HomeScreen} />
           </Drawer.Navigator>
         </NavigationContainer>
+        {dialog && (
+          <Portal>
+            <AboutModal handleDialog={handleDialog} />
+          </Portal>
+        )}
       </PreferencesContext.Provider>
     </PaperProvider>
   );
 }
+
+const AboutModal = ({ handleDialog }: { handleDialog: HandleRootDialog }) => {
+  const handleReset = () => {
+    return resetTables()
+      .then(() => console.log("Reset successfully"))
+      .catch((e) => console.error(e));
+  };
+
+  return (
+    <Dialog visible={true} onDismiss={() => handleDialog(undefined)}>
+      <View style={{ padding: 15 }}>
+        <View style={{ alignItems: "center" }}>
+          <Image
+            source={logo}
+            style={{
+              resizeMode: "contain",
+              width: 100,
+              height: 100
+            }}
+          />
+          <Text>TimeLapse</Text>
+        </View>
+        <Dialog.Content style={{ marginVertical: 30 }}>
+          <Text>Some About Text</Text>
+        </Dialog.Content>
+        <Dialog.Actions style={{ justifyContent: "space-between" }}>
+          <Button color="red" onPress={handleReset}>
+            Reset App
+          </Button>
+
+          <Button onPress={() => handleDialog(undefined)}>Close</Button>
+        </Dialog.Actions>
+      </View>
+    </Dialog>
+  );
+};

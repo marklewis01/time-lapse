@@ -1,5 +1,8 @@
 import * as SQLite from "expo-sqlite";
 
+export type RootDialog = "about" | "settings" | "newProject";
+export type HandleRootDialog = (s?: RootDialog) => void;
+
 export type orientation =
   | "landscape-left"
   | "landscape-right"

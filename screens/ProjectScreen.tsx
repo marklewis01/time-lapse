@@ -28,6 +28,7 @@ import {
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 
 // db
@@ -35,8 +36,12 @@ import {
   deleteProject,
   getOneProject,
   getProjectImages,
+  insertOneImage,
   updateProjectName
 } from "../db";
+
+// utils
+import { saveImageToAlbum } from "../utils";
 
 // TS
 import { IImage, IProject, ScreenStackParamList } from "../types";
@@ -147,6 +152,29 @@ export default ({ navigation, route }: Props) => {
   const handleCancelSelectMode = () => {
     setSelectMode(false);
     setSelected([]);
+  };
+
+  const handleImportImage = async () => {
+    if (!project) return;
+
+    // display media library
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    // on click, if selected, set state
+    const result = await ImagePicker.launchImageLibraryAsync();
+
+    if (result.cancelled) return;
+
+    // save image to project
+    const asset = await saveImageToAlbum(result.uri);
+
+    // write to db
+    await insertOneImage(project.id, asset[0]);
   };
 
   const handleTakePhoto = () => {
@@ -361,6 +389,10 @@ export default ({ navigation, route }: Props) => {
       )}
 
       <Appbar style={styles.bottomAppBar}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Appbar.Action icon="import" onPress={handleImportImage} />
+          <Text>Import Image</Text>
+        </View>
         <Appbar.Action icon="camera" onPress={handleTakePhoto} />
       </Appbar>
     </SafeAreaView>
@@ -376,7 +408,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   bottomAppBar: {
-    justifyContent: "center"
+    justifyContent: "space-between"
   },
   image: {
     justifyContent: "center",
