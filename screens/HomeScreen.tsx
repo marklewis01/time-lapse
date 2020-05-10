@@ -1,6 +1,15 @@
 import React from "react";
-import { Text, View } from "react-native";
-import { Appbar } from "react-native-paper";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import { Appbar, Button, Dialog, Portal, TextInput } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
 
@@ -8,29 +17,34 @@ import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // Screens
 import CameraScreen from "./CameraScreen";
+import CompareScreen from "./CompareScreen";
+import ProjectScreen from "./ProjectScreen";
+import TestScreen from "./TestScreen";
 
 // Comps
 import { ProjectCard } from "../components/Project";
-import { FlatList } from "react-native-gesture-handler";
+
+// DB
+import { getManyProjects, insertProject } from "../db";
+import { IProject, ScreenStackParamList } from "../types";
 
 // Navigation
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<ScreenStackParamList>();
 
-// TS
-type Props = {
-  navigation: any; // TODO: find correct type which extends DrawerActions
-};
-
-export default function HomeScreen({ navigation }: Props) {
+export default function HomeScreen() {
   return (
     <Stack.Navigator
       screenOptions={{
         headerTransparent: true,
-        title: ""
+        title: "",
+        headerShown: false
       }}
     >
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen name="CompareScreen" component={CompareScreen} />
+      <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
+      <Stack.Screen name="TestScreen" component={TestScreen} />
     </Stack.Navigator>
   );
 }
@@ -41,71 +55,139 @@ export default function HomeScreen({ navigation }: Props) {
  * ================================
  */
 
-const Home = ({ navigation }: any) => {
+const Home = () => {
+  const navigation = useNavigation<any>();
+
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean
   >();
-  const [projects, setProjects] = React.useState<MediaLibrary.Asset[] | null>(
-    null
-  );
+  const [dialog, setDialog] = React.useState(false);
+  const [newProject, setNewProject] = React.useState("");
+  const [projects, setProjects] = React.useState<IProject[]>([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const handleCloseModal = () => {
+    setNewProject("");
+    setDialog(false);
+  };
+
+  const handleGetProjects = async () => {
+    setRefreshing(true);
+    setProjects(await getManyProjects());
+    setRefreshing(false);
+  };
+
+  const handleSaveProject = async () => {
+    try {
+      // do nothing if no project name
+      if (newProject === "") return;
+
+      // do db work
+      const id = (await insertProject(newProject)) as number;
+      handleCloseModal();
+      navigation.navigate("ProjectScreen", { id });
+
+      // await handleGetProjects();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   React.useEffect(() => {
-    // on load, check to see if any photos
-    // Check / Obtain permissions on mount
     (async () => {
+      // Check / Obtain permissions on mount
       const {
         status: mediaStatus
       } = await MediaLibrary.requestPermissionsAsync();
 
       setCameraRollPermission(mediaStatus === "granted");
     })();
-  }, []);
 
-  React.useEffect(() => {
-    if (cameraRollPermission) {
-      (async () => {
-        const album = await MediaLibrary.getAlbumAsync(LOCAL_MEDIA_ALBUM_NAME);
-        if (album) {
-          const projects = await MediaLibrary.getAssetsAsync({
-            album: album.id
-          });
+    const unsubscribe = navigation.addListener("focus", () => {
+      // The screen is focused
+      handleGetProjects();
+    });
 
-          setProjects(projects.assets);
-        }
-      })();
-    }
-  }, [cameraRollPermission]);
-
-  // React.useEffect(() => {
-  //   console.log("adding listener");
-
-  //   MediaLibrary.addListener(() => {
-  //     console.log("file");
-  //   });
-
-  //   return () => MediaLibrary.removeAllListeners();
-  // }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   return cameraRollPermission === undefined ? (
     <View />
   ) : cameraRollPermission === false ? (
     <Text>Permission to save images to your device has been denied.</Text>
   ) : (
-    <View>
+    <SafeAreaView style={styles.container}>
       <Appbar.Header>
         <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
         <Appbar.Content title="" subtitle="" />
-        <Appbar.Action
-          icon="plus"
-          onPress={() => navigation.navigate("Camera")}
-        />
+        <Appbar.Action icon="plus" onPress={() => setDialog(true)} />
       </Appbar.Header>
 
       <FlatList
         data={projects}
-        renderItem={({ item, index }) => <ProjectCard />}
+        renderItem={({ item, index }) => <ProjectCard project={item} />}
         keyExtractor={(item, index) => index.toString()}
+        onRefresh={handleGetProjects}
+        refreshing={refreshing}
+        ListEmptyComponent={<Text>You have no projects</Text>}
       />
-    </View>
+      {dialog && (
+        <Portal>
+          <KeyboardAvoidingView
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+          >
+            <Dialog visible={dialog} onDismiss={() => setDialog(false)}>
+              <Dialog.Title>Create a new project?</Dialog.Title>
+              <Dialog.Content>
+                <TextInput
+                  label="Project Name"
+                  value={newProject}
+                  onChangeText={(text) => setNewProject(text)}
+                  mode="outlined"
+                />
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={handleCloseModal}>Cancel</Button>
+                <Button mode="contained" onPress={handleSaveProject}>
+                  Create
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </KeyboardAvoidingView>
+        </Portal>
+      )}
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    padding: 20,
+    alignItems: "center"
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  }
+});

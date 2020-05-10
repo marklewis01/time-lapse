@@ -1,51 +1,63 @@
 import * as React from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { BackHandler, Platform, StyleSheet, View } from "react-native";
 import {
   Drawer,
   Switch,
   TouchableRipple,
   Text,
-  Colors,
   useTheme,
   Button
 } from "react-native-paper";
 
-type Props = {
-  toggleTheme: () => void;
-  toggleRTL: () => void;
+import {
+  DrawerContentComponentProps,
+  DrawerContentOptions
+} from "@react-navigation/drawer";
+
+// TS
+import { HandleRootDialog } from "../../types";
+
+interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
+  handleDialog: HandleRootDialog;
+  toggleTheme(): void;
+  toggleRTL(): void;
   isRTL: boolean;
   isDarkTheme: boolean;
-};
+}
 
 const DrawerItemsData = [
-  { label: "Inbox", icon: "inbox", key: 0 },
-  { label: "Starred", icon: "star", key: 1 },
-  { label: "Sent mail", icon: "send", key: 2 },
-  { label: "Colored label", icon: "palette", key: 3 },
-  { label: "A very long title that will be truncated", icon: "delete", key: 4 }
+  { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 }
 ];
 
-const DrawerItems = ({ toggleTheme, toggleRTL, isRTL, isDarkTheme }: Props) => {
+const DrawerItems = ({
+  handleDialog,
+  toggleTheme,
+  toggleRTL,
+  isRTL,
+  isDarkTheme,
+  navigation
+}: Props) => {
+  const { colors } = useTheme();
   const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
 
-  const _setDrawerItem = (index: number) => setDrawerItemIndex(index);
+  const handleAbout = () => handleDialog("about");
 
-  const { colors } = useTheme();
+  const handleLogout = () => {
+    console.log("logout pressed");
+  };
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
-      <Drawer.Section title="Example items">
+      <Drawer.Section title="Photo Lapse">
         {DrawerItemsData.map((props, index) => (
           <Drawer.Item
             {...props}
-            key={props.key}
-            theme={
-              props.key === 3
-                ? { colors: { primary: Colors.tealA200 } }
-                : undefined
-            }
-            active={drawerItemIndex === index}
-            onPress={() => _setDrawerItem(index)}
+            key={index}
+            // active={drawerItemIndex === index}
+            onPress={() => {
+              setDrawerItemIndex(index);
+              navigation.navigate(props.navigation);
+            }}
           />
         ))}
       </Drawer.Section>
@@ -59,14 +71,25 @@ const DrawerItems = ({ toggleTheme, toggleRTL, isRTL, isDarkTheme }: Props) => {
             </View>
           </View>
         </TouchableRipple>
-        {/* <TouchableRipple onPress={toggleRTL}> */}
-        <View style={styles.preference}>
-          <Text>RTL</Text>
-          <View pointerEvents="none">
-            <Switch value={isRTL} />
+        <TouchableRipple onPress={toggleRTL}>
+          <View style={styles.preference}>
+            <Text>RTL</Text>
+            <View pointerEvents="none">
+              <Switch value={isRTL} />
+            </View>
           </View>
-        </View>
-        {/* </TouchableRipple> */}
+        </TouchableRipple>
+      </Drawer.Section>
+
+      <Drawer.Section>
+        {/* <TouchableRipple onPress={() => handleReset()}>
+          <View style={styles.preference}>
+            <Text>Factory Reset</Text>
+          </View>
+        </TouchableRipple> */}
+        <TouchableRipple onPress={handleAbout}>
+          <Drawer.Item label="About" />
+        </TouchableRipple>
       </Drawer.Section>
 
       <View style={styles.logoutSection}>
@@ -74,9 +97,9 @@ const DrawerItems = ({ toggleTheme, toggleRTL, isRTL, isDarkTheme }: Props) => {
           mode="contained"
           icon="logout"
           style={styles.logoutButton}
-          onPress={() => console.log("logout pressed")}
+          onPress={() => BackHandler.exitApp()}
         >
-          Logout
+          Exit
         </Button>
       </View>
     </View>

@@ -1,8 +1,12 @@
 {
   "cSpell.words": [
-    "appbar"
+    "appbar",
+    "autoincrement",
+    "uri"
   ],
   "cSpell.ignoreWords": [
-    "exif"
+    "exif",
+    "haptics",
+    "uri"
   ]
 }

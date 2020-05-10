@@ -12,3 +12,10 @@ web-report/
 
 # macOS
 .DS_Store
+
+
+# misc
+_old
+
+# misc sources
+artwork/

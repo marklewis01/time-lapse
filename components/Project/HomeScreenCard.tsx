@@ -1,23 +1,34 @@
 import * as React from "react";
-import { Avatar, Button, Card, Title, Paragraph } from "react-native-paper";
+import { Avatar, Card, IconButton } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import moment from "moment";
 
-const LeftContent = (props: any) => <Avatar.Icon {...props} icon="folder" />;
+// DB
+import { deleteProject } from "../../db";
 
-export const ProjectCard = () => (
-  <Card>
-    <Card.Title
-      title="Card Title"
-      subtitle="Card Subtitle"
-      left={LeftContent}
-    />
-    <Card.Content>
-      <Title>Card title</Title>
-      <Paragraph>Card content</Paragraph>
-    </Card.Content>
-    <Card.Cover source={{ uri: "https://picsum.photos/700" }} />
-    <Card.Actions>
-      <Button>Cancel</Button>
-      <Button>Ok</Button>
-    </Card.Actions>
-  </Card>
-);
+// TS
+import { IProject } from "../../types";
+
+export const ProjectCard = ({ project }: { project: IProject }) => {
+  const navigation = useNavigation();
+
+  const handleDelete = async (id: number) => {
+    await deleteProject(id);
+  };
+
+  const handlePress = () =>
+    navigation.navigate("ProjectScreen", { ...project });
+
+  return (
+    <Card onPress={handlePress} style={{ borderRadius: 0 }}>
+      <Card.Title
+        title={project.name}
+        subtitle={`Updated: ${moment(project.updated_at).fromNow()}`}
+        left={(props) => <Avatar.Icon {...props} icon="folder" />}
+        right={(props) => (
+          <IconButton {...props} icon="chevron-right" onPress={handlePress} />
+        )}
+      />
+    </Card>
+  );
+};
