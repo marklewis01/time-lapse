@@ -4,11 +4,7 @@
     "slug": "time-lapse",
     "icon": "./assets/icon.png",
     "version": "1.1.2",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "splash": {
       "image": "./assets/splash.png",
@@ -18,15 +14,15 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.interwebd.timelapse",
       "requireFullScreen": true,
       "supportsTablet": true,
       "buildNumber": "1.1.2"
     },
     "android": {
+      "package": "com.interwebd.timelapse",
       "versionCode": 370010102
     }
   }
