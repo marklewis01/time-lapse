@@ -1,6 +1,6 @@
 {
   "main": "./index",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -8,7 +8,9 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "publish": "expo publish --non-interactive",
-    "release": "standard-version"
+    "release-patch": "standard-version --release-as patch",
+    "release-minor": "standard-version --release-as minor",
+    "release-major": "standard-version --release-as major"
   },
   "dependencies": {
     "@react-native-community/masked-view": "0.1.6",
