@@ -3,7 +3,7 @@
     "name": "Time Lapse",
     "slug": "time-lapse",
     "icon": "./assets/icon.png",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "platforms": [
       "ios",
       "android",
@@ -24,10 +24,10 @@
     "ios": {
       "requireFullScreen": true,
       "supportsTablet": true,
-      "buildNumber": "1.1.0"
+      "buildNumber": "1.1.1"
     },
     "android": {
-      "versionCode": 370010100
+      "versionCode": 370010101
     }
   }
 }
