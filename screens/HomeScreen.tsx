@@ -8,7 +8,15 @@ import {
   Text,
   View
 } from "react-native";
-import { Appbar, Button, Dialog, Portal, TextInput } from "react-native-paper";
+import {
+  Appbar,
+  Button,
+  Dialog,
+  Portal,
+  Surface,
+  TextInput,
+  useTheme
+} from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
@@ -57,6 +65,7 @@ export default function HomeScreen() {
 
 const Home = () => {
   const navigation = useNavigation<any>();
+  const theme = useTheme();
 
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean
@@ -116,13 +125,20 @@ const Home = () => {
   ) : cameraRollPermission === false ? (
     <Text>Permission to save images to your device has been denied.</Text>
   ) : (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ backgroundColor: theme.colors.background, flex: 1 }}>
       <Appbar.Header>
-        <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+        <Appbar.Action
+          color={theme.colors.onBackground}
+          icon="menu"
+          onPress={() => navigation.openDrawer()}
+        />
         <Appbar.Content title="" subtitle="" />
-        <Appbar.Action icon="plus" onPress={() => setDialog(true)} />
+        <Appbar.Action
+          color={theme.colors.onBackground}
+          icon="plus"
+          onPress={() => setDialog(true)}
+        />
       </Appbar.Header>
-
       <FlatList
         data={projects}
         renderItem={({ item, index }) => <ProjectCard project={item} />}
@@ -161,33 +177,34 @@ const Home = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
-  },
-  modalView: {
-    padding: 20,
-    alignItems: "center"
-  },
-  openButton: {
-    backgroundColor: "#F194FF",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center"
-  }
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     // flex: 1,
+//     // backgroundColor: theme.colors.background
+//   },
+//   centeredView: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     marginTop: 22
+//   },
+//   modalView: {
+//     padding: 20,
+//     alignItems: "center"
+//   },
+//   openButton: {
+//     backgroundColor: "#F194FF",
+//     borderRadius: 20,
+//     padding: 10,
+//     elevation: 2
+//   },
+//   textStyle: {
+//     color: "white",
+//     fontWeight: "bold",
+//     textAlign: "center"
+//   },
+//   modalText: {
+//     marginBottom: 15,
+//     textAlign: "center"
+//   }
+// });

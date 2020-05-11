@@ -21,9 +21,9 @@ import {
   Menu,
   Portal,
   ProgressBar,
-  Surface,
   Text,
-  TextInput
+  TextInput,
+  useTheme
 } from "react-native-paper";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -76,6 +76,8 @@ export default ({ navigation, route }: Props) => {
   const [project, setProject] = React.useState<IProject>();
   const [selected, setSelected] = React.useState<number[]>([]);
   const [selectMode, setSelectMode] = React.useState(false);
+
+  const theme = useTheme();
 
   const handleGetProject = async () => {
     // get from project table
@@ -221,17 +223,22 @@ export default ({ navigation, route }: Props) => {
     <SafeAreaView style={styles.container}>
       <Appbar.Header>
         <Appbar.Action
+          color={theme.colors.onSurface}
           icon="chevron-left"
           onPress={() => navigation.goBack()}
         />
-        <Appbar.Content title={project.name} subtitle="" />
+        <Appbar.Content
+          color={theme.colors.onSurface}
+          title={project.name}
+          subtitle=""
+        />
         <Menu
           visible={menu}
           onDismiss={() => setMenu(false)}
           anchor={
             <IconButton
               icon="dots-vertical"
-              color="white"
+              color={theme.colors.onSurface}
               size={20}
               onPress={() => setMenu(true)}
             />
@@ -248,32 +255,12 @@ export default ({ navigation, route }: Props) => {
           />
         </Menu>
       </Appbar.Header>
-      <Surface style={styles.toolbar}>
-        {selectMode ? (
-          <View style={styles.toolbarActions}>
-            <Text style={{ marginLeft: 15 }}>
-              {selected.length + " selected"}
-            </Text>
-            {selectMode && (
-              <Button onPress={handleCancelSelectMode}>Cancel</Button>
-            )}
-          </View>
-        ) : (
-          <Button onPress={() => setSelectMode(true)}>Select Images</Button>
-        )}
-        <Button
-          disabled={selected.length < 2}
-          mode={selected.length < 2 ? "text" : "contained"}
-          onPress={handleGoToCompareScreen}
-        >
-          Compare
-        </Button>
-      </Surface>
 
       <View
         style={{
           justifyContent: "center",
-          flex: 1
+          flex: 1,
+          backgroundColor: theme.colors.background
         }}
       >
         {loadingImages ? (
@@ -298,10 +285,16 @@ export default ({ navigation, route }: Props) => {
                   style={[
                     {
                       height: imageWidth,
-                      width: imageWidth
+                      width: imageWidth,
+                      borderWidth: 4
                     },
-                    selectMode && styles.toSelect,
-                    selected.includes(item.id) && styles.isSelected,
+                    {
+                      borderColor: selected.includes(item.id)
+                        ? theme.colors.primary
+                        : selectMode
+                        ? theme.colors.backdrop
+                        : undefined
+                    },
                     selected.length >= 2 &&
                       !selected.includes(item.id) &&
                       styles.cannotSelect
@@ -318,6 +311,43 @@ export default ({ navigation, route }: Props) => {
           />
         )}
       </View>
+      <Appbar style={styles.bottomAppBar}>
+        {selectMode ? (
+          <Button
+            disabled={selected.length < 2}
+            mode={selected.length < 2 ? "text" : "contained"}
+            onPress={handleGoToCompareScreen}
+            color={theme.colors.onBackground}
+            dark
+          >
+            {"Compare" + (selected.length > 0 ? ` (${selected.length})` : "")}
+          </Button>
+        ) : (
+          <Button
+            mode="text"
+            color={theme.colors.onBackground}
+            onPress={() => setSelectMode(true)}
+          >
+            Compare Images
+          </Button>
+        )}
+        {selectMode ? (
+          <Button
+            color={theme.colors.onBackground}
+            onPress={handleCancelSelectMode}
+          >
+            Cancel
+          </Button>
+        ) : (
+          <IconButton
+            color={theme.colors.onSurface}
+            icon="camera"
+            onPress={handleTakePhoto}
+          />
+        )}
+      </Appbar>
+
+      {/* {dialog === } */}
 
       {dialog === "projectName" && (
         <Portal>
@@ -387,14 +417,6 @@ export default ({ navigation, route }: Props) => {
           </Dialog>
         </Portal>
       )}
-
-      <Appbar style={styles.bottomAppBar}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Appbar.Action icon="import" onPress={handleImportImage} />
-          <Text>Import Image</Text>
-        </View>
-        <Appbar.Action icon="camera" onPress={handleTakePhoto} />
-      </Appbar>
     </SafeAreaView>
   ) : (
     <React.Fragment>
@@ -410,21 +432,17 @@ const styles = StyleSheet.create({
   bottomAppBar: {
     justifyContent: "space-between"
   },
+  button: {
+    backgroundColor: "black"
+  },
   image: {
     justifyContent: "center",
     alignItems: "center",
     height: 100
   },
   cannotSelect: {
+    borderWidth: 0,
     opacity: 0.5
-  },
-  isSelected: {
-    borderWidth: 4,
-    borderColor: "#F1C808"
-  },
-  toSelect: {
-    borderWidth: 4,
-    borderColor: "lightgrey"
   },
   toolbar: {
     flexDirection: "row",

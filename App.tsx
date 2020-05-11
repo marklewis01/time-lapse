@@ -1,13 +1,12 @@
 import React from "react";
-import { AsyncStorage, I18nManager, Image, Text, View } from "react-native";
+import { AsyncStorage, I18nManager, Image, View } from "react-native";
 import { Updates } from "expo";
 import {
   Button,
-  DarkTheme,
-  DefaultTheme,
   Dialog,
   Portal,
   Provider as PaperProvider,
+  Text,
   Theme
 } from "react-native-paper";
 import { InitialState, NavigationContainer } from "@react-navigation/native";
@@ -31,6 +30,9 @@ import {
 
 // TS
 import { RootDialog, HandleRootDialog } from "./types";
+
+// Theme
+import { customDefaultTheme, customDarkTheme } from "./theme.style";
 
 // Context
 const PreferencesContext = React.createContext<any>(null);
@@ -62,24 +64,6 @@ const Drawer = createDrawerNavigator<{ Home: undefined }>();
 // Local Storage Settings
 const PERSISTENCE_KEY = "NAVIGATION_STATE";
 const PREFERENCES_KEY = "APP_PREFERENCES";
-
-const customDefaultTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: "#F1A208",
-    accent: "#F1C808"
-  }
-};
-
-const customDarkTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: "#BD7200",
-    accent: "#FCBB3C"
-  }
-};
 
 // App
 export default function App() {
