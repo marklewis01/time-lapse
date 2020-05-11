@@ -1,19 +1,25 @@
 import React from "react";
 import {
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  StyleSheet,
-  Text,
   View
 } from "react-native";
-import { Appbar, Button, Dialog, Portal, TextInput } from "react-native-paper";
+import {
+  Appbar,
+  Button,
+  Dialog,
+  Portal,
+  Text,
+  TextInput,
+  useTheme,
+  Paragraph
+} from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as MediaLibrary from "expo-media-library";
-
-import { LOCAL_MEDIA_ALBUM_NAME } from "../constants";
 
 // Screens
 import CameraScreen from "./CameraScreen";
@@ -30,6 +36,9 @@ import { IProject, ScreenStackParamList } from "../types";
 
 // Navigation
 const Stack = createStackNavigator<ScreenStackParamList>();
+
+// Images
+import ArrowSvg from "../assets/right-curve-arrow.png";
 
 export default function HomeScreen() {
   return (
@@ -57,6 +66,7 @@ export default function HomeScreen() {
 
 const Home = () => {
   const navigation = useNavigation<any>();
+  const theme = useTheme();
 
   const [cameraRollPermission, setCameraRollPermission] = React.useState<
     boolean
@@ -116,20 +126,53 @@ const Home = () => {
   ) : cameraRollPermission === false ? (
     <Text>Permission to save images to your device has been denied.</Text>
   ) : (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ backgroundColor: theme.colors.background, flex: 1 }}>
       <Appbar.Header>
-        <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+        <Appbar.Action
+          color={theme.colors.onBackground}
+          icon="menu"
+          onPress={() => navigation.openDrawer()}
+        />
         <Appbar.Content title="" subtitle="" />
-        <Appbar.Action icon="plus" onPress={() => setDialog(true)} />
+        <Appbar.Action
+          color={theme.colors.onBackground}
+          icon="plus"
+          onPress={() => setDialog(true)}
+        />
       </Appbar.Header>
-
       <FlatList
         data={projects}
-        renderItem={({ item, index }) => <ProjectCard project={item} />}
+        renderItem={({ item }) => <ProjectCard project={item} />}
         keyExtractor={(item, index) => index.toString()}
         onRefresh={handleGetProjects}
         refreshing={refreshing}
-        ListEmptyComponent={<Text>You have no projects</Text>}
+        ListEmptyComponent={
+          <View
+            style={{
+              paddingVertical: 15,
+              flexDirection: "row",
+              alignItems: "flex-start",
+              justifyContent: "flex-end"
+            }}
+          >
+            <View
+              style={{
+                marginTop: 20,
+                maxWidth: 250,
+                alignItems: "center"
+              }}
+            >
+              <Paragraph style={{ textAlign: "center" }}>
+                You don't have any projects yet. Click this button to create
+                your first project.
+              </Paragraph>
+            </View>
+            <Image
+              source={ArrowSvg}
+              style={{ marginRight: 20, marginLeft: 5 }}
+            />
+          </View>
+        }
       />
       {dialog && (
         <Portal>
@@ -149,7 +192,11 @@ const Home = () => {
               </Dialog.Content>
               <Dialog.Actions>
                 <Button onPress={handleCloseModal}>Cancel</Button>
-                <Button mode="contained" onPress={handleSaveProject}>
+                <Button
+                  mode="contained"
+                  onPress={handleSaveProject}
+                  color={theme.colors.onBackground}
+                >
                   Create
                 </Button>
               </Dialog.Actions>
@@ -160,34 +207,3 @@ const Home = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
-  },
-  modalView: {
-    padding: 20,
-    alignItems: "center"
-  },
-  openButton: {
-    backgroundColor: "#F194FF",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center"
-  }
-});

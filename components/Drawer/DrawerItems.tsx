@@ -14,27 +14,23 @@ import {
   DrawerContentOptions
 } from "@react-navigation/drawer";
 
-import { resetTables } from "../../db";
+// TS
+import { HandleRootDialog } from "../../types";
 
 interface Props extends DrawerContentComponentProps<DrawerContentOptions> {
-  toggleTheme: () => void;
-  toggleRTL: () => void;
+  handleDialog: HandleRootDialog;
+  toggleTheme(): void;
+  toggleRTL(): void;
   isRTL: boolean;
   isDarkTheme: boolean;
 }
 
 const DrawerItemsData = [
   { label: "Dashboard", icon: "home", navigation: "HomeScreen", key: 0 }
-  // { label: "Take Photo", icon: "camera", navigation: "Camera", key: 1 },
-  // {
-  //   label: "Test Screen",
-  //   icon: "test-tube",
-  //   navigation: "TestScreen",
-  //   key: 2
-  // }
 ];
 
 const DrawerItems = ({
+  handleDialog,
   toggleTheme,
   toggleRTL,
   isRTL,
@@ -44,15 +40,11 @@ const DrawerItems = ({
   const { colors } = useTheme();
   const [drawerItemIndex, setDrawerItemIndex] = React.useState<number>(0);
 
-  const handleReset = () => {
-    return resetTables()
-      .then(() => console.log("Reset successfully"))
-      .catch((e) => console.error(e));
-  };
+  const handleAbout = () => handleDialog("about");
 
-  const handleLogout = () => {
-    console.log("logout pressed");
-  };
+  // const handleLogout = () => {
+  //   console.log("logout pressed");
+  // };
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
@@ -89,13 +81,16 @@ const DrawerItems = ({
         </TouchableRipple>
       </Drawer.Section>
 
-      {/* <Drawer.Section>
-        <TouchableRipple onPress={() => handleReset()}>
+      <Drawer.Section>
+        {/* <TouchableRipple onPress={() => handleReset()}>
           <View style={styles.preference}>
             <Text>Factory Reset</Text>
           </View>
+        </TouchableRipple> */}
+        <TouchableRipple onPress={handleAbout}>
+          <Drawer.Item label="About" />
         </TouchableRipple>
-      </Drawer.Section> */}
+      </Drawer.Section>
 
       <View style={styles.logoutSection}>
         <Button
