@@ -42,10 +42,6 @@ const DrawerItems = ({
 
   const handleAbout = () => handleDialog("about");
 
-  // const handleLogout = () => {
-  //   console.log("logout pressed");
-  // };
-
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
       <Drawer.Section title="Photo Lapse">

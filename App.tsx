@@ -221,11 +221,6 @@ export default function App() {
 }
 
 const AboutModal = ({ handleDialog }: { handleDialog: HandleRootDialog }) => {
-  const buildNumber =
-    Constants.platform && Constants.platform.ios
-      ? Constants.platform.ios.buildNumber
-      : Constants.platform?.android?.versionCode;
-
   const handleReset = () => {
     return resetTables()
       .then(() => console.log("Reset successfully"))
@@ -246,8 +241,8 @@ const AboutModal = ({ handleDialog }: { handleDialog: HandleRootDialog }) => {
           />
           <Text>TimeLapse</Text>
         </View>
-        <Dialog.Content style={{ marginVertical: 30 }}>
-          {buildNumber && <Text>Build: {buildNumber}</Text>}
+        <Dialog.Content style={{ marginVertical: 30, alignItems: "center" }}>
+          <Text>Version: {Constants.manifest.version}</Text>
         </Dialog.Content>
         <Dialog.Actions style={{ justifyContent: "space-between" }}>
           <Button color="red" onPress={handleReset}>
