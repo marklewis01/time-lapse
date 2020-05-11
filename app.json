@@ -3,8 +3,12 @@
     "name": "Time Lapse",
     "slug": "time-lapse",
     "icon": "./assets/icon.png",
-    "version": "1.1.3",
-    "platforms": ["ios", "android", "web"],
+    "version": "1.2.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "splash": {
       "image": "./assets/splash.png",
@@ -14,16 +18,18 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.interwebd.timelapse",
       "requireFullScreen": true,
       "supportsTablet": true,
-      "buildNumber": "1.1.3"
+      "buildNumber": "1.2.0"
     },
     "android": {
       "package": "com.interwebd.timelapse",
-      "versionCode": 370010103
+      "versionCode": 370010200
     },
     "primaryColor": "#F1A208"
   }
