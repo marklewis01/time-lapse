@@ -15,6 +15,7 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions
 } from "@react-navigation/drawer";
+import Constants from "expo-constants";
 
 // Custom comps
 import HomeScreen from "./screens/HomeScreen";
@@ -241,7 +242,12 @@ const AboutModal = ({ handleDialog }: { handleDialog: HandleRootDialog }) => {
           <Text>TimeLapse</Text>
         </View>
         <Dialog.Content style={{ marginVertical: 30 }}>
-          <Text>Some About Text</Text>
+          <Text>
+            Build:{" "}
+            {Constants.platform.ios
+              ? Constants.platform.ios.buildNumber
+              : Constants.platform.android?.versionCode}
+          </Text>
         </Dialog.Content>
         <Dialog.Actions style={{ justifyContent: "space-between" }}>
           <Button color="red" onPress={handleReset}>
