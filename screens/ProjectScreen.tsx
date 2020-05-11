@@ -14,6 +14,7 @@ import {
   Appbar,
   Button,
   Checkbox,
+  Caption,
   Colors,
   Dialog,
   Divider,
@@ -44,7 +45,12 @@ import {
 import { saveImageToAlbum } from "../utils";
 
 // TS
-import { IImage, IProject, ScreenStackParamList } from "../types";
+import {
+  IImage,
+  IProject,
+  ProjectScreenDialog,
+  ScreenStackParamList
+} from "../types";
 type ProjectScreenNavigationProp = StackNavigationProp<
   ScreenStackParamList,
   "ProjectScreen"
@@ -61,12 +67,11 @@ const IMAGE_PADDING = 5;
 
 const windowWidth = Dimensions.get("window").width;
 const imageWidth =
-  (windowWidth - 2 * IMAGE_PADDING * IMAGES_PER_ROW) / IMAGES_PER_ROW;
+  (windowWidth - 2 * IMAGE_PADDING * IMAGES_PER_ROW - 2 * IMAGE_PADDING) /
+  IMAGES_PER_ROW;
 
 export default ({ navigation, route }: Props) => {
-  const [dialog, setDialog] = React.useState<"delete" | "projectName" | null>(
-    null
-  );
+  const [dialog, setDialog] = React.useState<ProjectScreenDialog>();
   const [deleteLocalImages, setDeleteLocalImages] = React.useState(false);
   const [images, setImages] = React.useState<IImage[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -112,7 +117,7 @@ export default ({ navigation, route }: Props) => {
   };
 
   const handleEditProjectNameDialog = () => {
-    setDialog("projectName");
+    setDialog("name");
     setMenu(false);
     setNewName(project?.name);
   };
@@ -120,7 +125,7 @@ export default ({ navigation, route }: Props) => {
     if (!newName || newName === "") return;
 
     await updateProjectName(route.params.id, newName);
-    setDialog(null);
+    setDialog(undefined);
   };
 
   const handleGoToCompareScreen = () => {
@@ -156,33 +161,31 @@ export default ({ navigation, route }: Props) => {
     setSelected([]);
   };
 
-  const handleImportImage = async () => {
+  const handleGetImage = async (s: "album" | "camera") => {
+    setDialog(undefined);
     if (!project) return;
 
-    // display media library
-    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+    if (s === "album") {
+      let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
 
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
+      if (permissionResult.granted === false) {
+        alert("Permission to access camera roll is required!");
+        return;
+      }
+
+      // on click, if selected, set state
+      const result = await ImagePicker.launchImageLibraryAsync();
+      if (result.cancelled) return;
+
+      // save image to project
+      const asset = await saveImageToAlbum(result.uri);
+
+      // write to db
+      await insertOneImage(project.id, asset[0]);
+    } else {
+      // camera
+      navigation.navigate("Camera", { projectId: project.id });
     }
-
-    // on click, if selected, set state
-    const result = await ImagePicker.launchImageLibraryAsync();
-
-    if (result.cancelled) return;
-
-    // save image to project
-    const asset = await saveImageToAlbum(result.uri);
-
-    // write to db
-    await insertOneImage(project.id, asset[0]);
-  };
-
-  const handleTakePhoto = () => {
-    if (!project) return; // TODO: make Snack for error message
-
-    navigation.navigate("Camera", { projectId: project.id });
   };
 
   React.useEffect(() => {
@@ -258,9 +261,10 @@ export default ({ navigation, route }: Props) => {
 
       <View
         style={{
-          justifyContent: "center",
           flex: 1,
-          backgroundColor: theme.colors.background
+          backgroundColor: theme.colors.background,
+          paddingVertical: 2 * IMAGE_PADDING,
+          paddingHorizontal: IMAGE_PADDING
         }}
       >
         {loadingImages ? (
@@ -311,6 +315,7 @@ export default ({ navigation, route }: Props) => {
           />
         )}
       </View>
+
       <Appbar style={styles.bottomAppBar}>
         {selectMode ? (
           <Button
@@ -318,7 +323,6 @@ export default ({ navigation, route }: Props) => {
             mode={selected.length < 2 ? "text" : "contained"}
             onPress={handleGoToCompareScreen}
             color={theme.colors.onBackground}
-            dark
           >
             {"Compare" + (selected.length > 0 ? ` (${selected.length})` : "")}
           </Button>
@@ -342,16 +346,77 @@ export default ({ navigation, route }: Props) => {
           <IconButton
             color={theme.colors.onSurface}
             icon="camera"
-            onPress={handleTakePhoto}
+            onPress={() => setDialog("selectImage")}
           />
         )}
       </Appbar>
 
-      {/* {dialog === } */}
-
-      {dialog === "projectName" && (
+      {dialog === "selectImage" && (
         <Portal>
-          <Dialog visible={true} onDismiss={() => setDialog(null)}>
+          <Dialog visible={true} onDismiss={() => setDialog(undefined)}>
+            <View
+              style={{
+                flexDirection: "row",
+                paddingBottom: 15
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 25,
+                  paddingTop: 20
+                }}
+              >
+                <IconButton
+                  icon="image"
+                  size={50}
+                  color={theme.colors.onSurface}
+                  onPress={() => handleGetImage("album")}
+                />
+                <Caption style={{ textAlign: "center" }}>
+                  Choose an existing image
+                </Caption>
+              </View>
+              <View
+                style={{
+                  borderRightWidth: 1,
+                  borderColor: theme.colors.disabled,
+                  marginTop: 30
+                }}
+              />
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 25,
+                  paddingTop: 20
+                }}
+              >
+                <IconButton
+                  icon="camera"
+                  size={50}
+                  color={theme.colors.onSurface}
+                  name="camera"
+                  onPress={() => handleGetImage("camera")}
+                />
+                <Caption style={{ textAlign: "center" }}>
+                  Take a new photo with the Camera
+                </Caption>
+              </View>
+            </View>
+            <Dialog.Actions>
+              <Button onPress={() => setDialog(undefined)}>Cancel</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      )}
+
+      {dialog === "name" && (
+        <Portal>
+          <Dialog visible={true} onDismiss={() => setDialog(undefined)}>
             <Dialog.Title>Rename Project?</Dialog.Title>
             <Dialog.Content>
               <TextInput
@@ -362,7 +427,7 @@ export default ({ navigation, route }: Props) => {
               />
             </Dialog.Content>
             <Dialog.Actions style={{ justifyContent: "space-between" }}>
-              <Button onPress={() => setDialog(null)}>Cancel</Button>
+              <Button onPress={() => setDialog(undefined)}>Cancel</Button>
               <Button mode="contained" onPress={handleEditProjectName}>
                 Update
               </Button>
@@ -370,11 +435,12 @@ export default ({ navigation, route }: Props) => {
           </Dialog>
         </Portal>
       )}
+
       {dialog === "delete" && (
         <Portal>
           <Dialog
             visible={true}
-            onDismiss={() => setDialog(null)}
+            onDismiss={() => setDialog(undefined)}
             dismissable={!loading}
           >
             <Dialog.Title>Delete Project?</Dialog.Title>
@@ -401,7 +467,7 @@ export default ({ navigation, route }: Props) => {
               </View>
             </Dialog.Content>
             <Dialog.Actions style={{ justifyContent: "space-between" }}>
-              <Button onPress={() => setDialog(null)} disabled={loading}>
+              <Button onPress={() => setDialog(undefined)} disabled={loading}>
                 Cancel
               </Button>
               <Button

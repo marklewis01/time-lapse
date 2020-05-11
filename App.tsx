@@ -135,6 +135,7 @@ export default function App() {
   }, []);
 
   React.useEffect(() => {
+    // TODO: move this to SQLite instead of localStorage
     const savePrefs = async () => {
       try {
         await AsyncStorage.setItem(
