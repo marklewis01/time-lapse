@@ -25,7 +25,6 @@ import * as MediaLibrary from "expo-media-library";
 import CameraScreen from "./CameraScreen";
 import CompareScreen from "./CompareScreen";
 import ProjectScreen from "./ProjectScreen";
-import TestScreen from "./TestScreen";
 
 // Comps
 import { ProjectCard } from "../components/Project";
@@ -53,7 +52,6 @@ export default function HomeScreen() {
       <Stack.Screen name="Camera" component={CameraScreen} />
       <Stack.Screen name="CompareScreen" component={CompareScreen} />
       <Stack.Screen name="ProjectScreen" component={ProjectScreen} />
-      <Stack.Screen name="TestScreen" component={TestScreen} />
     </Stack.Navigator>
   );
 }
