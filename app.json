@@ -3,7 +3,7 @@
     "name": "Time Lapse",
     "slug": "time-lapse",
     "icon": "./assets/icon.png",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "platforms": [
       "ios",
       "android",
@@ -25,11 +25,11 @@
       "bundleIdentifier": "com.interwebd.timelapse",
       "requireFullScreen": true,
       "supportsTablet": true,
-      "buildNumber": "1.3.2"
+      "buildNumber": "1.3.3"
     },
     "android": {
       "package": "com.interwebd.timelapse",
-      "versionCode": 370010302
+      "versionCode": 370010303
     },
     "primaryColor": "#F1A208"
   }
