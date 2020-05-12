@@ -20,6 +20,7 @@ import {
   Divider,
   IconButton,
   Menu,
+  Paragraph,
   Portal,
   ProgressBar,
   Text,
@@ -43,6 +44,9 @@ import {
 
 // utils
 import { saveImageToAlbum } from "../utils";
+
+// Images
+import ArrowSvg from "../assets/right-curve-arrow.png";
 
 // TS
 import {
@@ -125,6 +129,7 @@ export default ({ navigation, route }: Props) => {
     if (!newName || newName === "") return;
 
     await updateProjectName(route.params.id, newName);
+    handleGetProject();
     setDialog(undefined);
   };
 
@@ -182,6 +187,9 @@ export default ({ navigation, route }: Props) => {
 
       // write to db
       await insertOneImage(project.id, asset[0]);
+
+      // update screen
+      handleGetProject();
     } else {
       // camera
       navigation.navigate("Camera", { projectId: project.id });
@@ -269,7 +277,7 @@ export default ({ navigation, route }: Props) => {
       >
         {loadingImages ? (
           <ProgressBar />
-        ) : (
+        ) : images.length ? (
           <FlatList
             data={images}
             renderItem={({ item }) => (
@@ -313,6 +321,37 @@ export default ({ navigation, route }: Props) => {
             ListFooterComponent={<View />}
             ListFooterComponentStyle={{ marginBottom: 30 }}
           />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              paddingVertical: 15,
+              flexDirection: "row",
+              alignItems: "flex-end",
+              justifyContent: "flex-end"
+            }}
+          >
+            <View
+              style={{
+                marginBottom: 20,
+                maxWidth: 250,
+                alignItems: "center"
+              }}
+            >
+              <Paragraph style={{ textAlign: "center" }}>
+                You don't have any images yet. Click this button to add images
+                from your device library or by taking a photo.
+              </Paragraph>
+            </View>
+            <Image
+              source={ArrowSvg}
+              style={{
+                marginRight: 10,
+                marginLeft: 5,
+                transform: [{ scaleY: -1 }]
+              }}
+            />
+          </View>
         )}
       </View>
 
@@ -331,6 +370,7 @@ export default ({ navigation, route }: Props) => {
             mode="text"
             color={theme.colors.onBackground}
             onPress={() => setSelectMode(true)}
+            disabled={images.length < 2}
           >
             Compare Images
           </Button>

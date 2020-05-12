@@ -49,7 +49,6 @@ const DrawerItems = ({
           <Drawer.Item
             {...props}
             key={index}
-            // active={drawerItemIndex === index}
             onPress={() => {
               setDrawerItemIndex(index);
               navigation.navigate(props.navigation);
@@ -78,11 +77,6 @@ const DrawerItems = ({
       </Drawer.Section>
 
       <Drawer.Section>
-        {/* <TouchableRipple onPress={() => handleReset()}>
-          <View style={styles.preference}>
-            <Text>Factory Reset</Text>
-          </View>
-        </TouchableRipple> */}
         <TouchableRipple onPress={handleAbout}>
           <Drawer.Item label="About" />
         </TouchableRipple>
