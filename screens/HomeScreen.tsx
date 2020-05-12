@@ -169,7 +169,7 @@ const Home = () => {
             </View>
             <Image
               source={ArrowSvg}
-              style={{ marginRight: 10, marginLeft: 5 }}
+              style={{ marginRight: 20, marginLeft: 5 }}
             />
           </View>
         }
