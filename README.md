@@ -6,7 +6,7 @@
 
 ## App overview video
 
-<a href="http://www.youtube.com/watch?v=egwMR__ZgnE" target="_blank">
+<a href="http://www.youtube.com/watch?v=egwMR__ZgnE" target=”_blank”>
   <img src="https://marklewis01.github.io/timelapse/youtube-thumb.png" alt="A quick video overview" height="400">
 </a>
 
@@ -39,19 +39,12 @@
 
 ## Screenshots
 
-<img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png" width="350" />
+<img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png" width="350" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" width="350" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png" width="350" />
 
-<img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" width="350" />
-
-<img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png" width="350" />
-
-<img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" width="350" />
-
-<img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png" width="350" />
-
-<img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" width="350" />
+<img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" width="350" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png" width="350" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" width="350" />
 
 ## Final Thoughts
 
 The app could seem trivial in nature, however the purpose was to get acquainted with React Native and the Expo framework - the purpose of the app was secondary.
+
 Saying the above, possible further development could be through allowing users to 'share' comparison images, or even generate timelapse videos through stitching multiple images. I did investigate stitching together videos using a React-Native FFMpeg library, however this would require ejecting from Expo, as such, it wasn't an ideal step in the project. I would consider building a server-side service which would perform the video rendering component, however again, for now that is not in the intended project scope.
