@@ -18,5 +18,4 @@ web-report/
 _old
 
 # misc sources
-artwork/
-builds/
+*.code-workspace
