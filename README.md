@@ -39,9 +39,9 @@
 
 ## Screenshots
 
-<img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png" style="width: 32%; margin-right: 1%"  /> <img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" style="width: 32%; margin-right: 1%" /> <img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png" style="width: 32%;"  />
+<img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png" width="300" />
 
-<img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" style="width: 32%; margin-right: 1%" /> <img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png" style="width: 32%; margin-right: 1%" /> <img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" style="width: 32%;" />
+<img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" width="300" />
 
 ## Final Thoughts
 
