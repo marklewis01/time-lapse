@@ -1,4 +1,12 @@
 {
+  "name": "time-lapse",
+  "author": {
+    "name": "Mark Lewis",
+    "email": "hello@interwebd.com",
+    "url": "https://interwebd.com"
+  },
+  "description": "My first React Native app. No real use-case, purpose or design intent, rather, a neat attempt at a resolved app.",
+  "repository": "github:marklewis01/time-lapse.git",
   "main": "./index",
   "version": "1.3.3",
   "scripts": {

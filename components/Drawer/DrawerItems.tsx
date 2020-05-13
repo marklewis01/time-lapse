@@ -44,7 +44,7 @@ const DrawerItems = ({
 
   return (
     <View style={[styles.drawerContent, { backgroundColor: colors.surface }]}>
-      <Drawer.Section title="Photo Lapse">
+      <Drawer.Section title="Time Lapse">
         {DrawerItemsData.map((props, index) => (
           <Drawer.Item
             {...props}

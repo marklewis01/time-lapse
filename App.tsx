@@ -239,7 +239,7 @@ const AboutModal = ({ handleDialog }: { handleDialog: HandleRootDialog }) => {
               height: 100
             }}
           />
-          <Text>TimeLapse</Text>
+          <Text>Time Lapse</Text>
         </View>
         <Dialog.Content style={{ marginVertical: 30, alignItems: "center" }}>
           <Text>Version: {Constants.manifest.version}</Text>
