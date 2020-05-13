@@ -2,7 +2,9 @@
 
 ### Just a neat and resolved app to explore Expo and the React Native APIs with.
 
-[![A quick video overview](http://img.youtube.com/vi/egwMR__ZgnE/0.jpg)](http://www.youtube.com/watch?v=egwMR__ZgnE "A quick video overview")
+<a href="http://www.youtube.com/watch?v=egwMR__ZgnE" target="_blank">
+  <img src="http://img.youtube.com/vi/egwMR__ZgnE/0.jpg" alt="A quick video overview">
+</a>
 
 ## Expo Link
 
