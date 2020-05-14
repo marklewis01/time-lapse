@@ -6,7 +6,7 @@
 
 ## App overview video
 
-<a href="http://www.youtube.com/watch?v=egwMR__ZgnE" target=”_blank”>
+<a href="http://www.youtube.com/watch?v=egwMR__ZgnE" target="_blank">
   <img src="https://marklewis01.github.io/timelapse/youtube-thumb.png" alt="A quick video overview" height="400">
 </a>
 
