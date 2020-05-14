@@ -1,4 +1,4 @@
-# Time-Lapse
+# <div style="display: flex; align-items: center"><img src="https://marklewis01.github.io/timelapse/icon.png" height="50"/><span style="margin-left: 16px">Time-Lapse</span></div>
 
 ### Just a neat and resolved app to explore Expo and the React Native APIs with.
 
