@@ -39,9 +39,11 @@
 
 ## Screenshots
 
-<img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png" width="300" />
-
-<img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png" width="300" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" width="300" />
+|                            Create multiple projects                            |                          Select existing or use camera                          |                             Select images to compare                             |
+| :----------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+| <img src="https://marklewis01.github.io/timelapse/timelapse-interface-1.png"/> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-2.png" /> | <img src="https://marklewis01.github.io/timelapse/timelapse-interface-3.png"  /> |
+|                             Easy comparison slider                             |                                    Dark mode                                    |                              Right-to-Left support                               |
+|  <img src="https://marklewis01.github.io/timelapse/timelapse-compare.png" />   |   <img src="https://marklewis01.github.io/timelapse/timelapse-darkmode.png"/>   |     <img src="https://marklewis01.github.io/timelapse/timelapse-rtl.png" />      |
 
 ## Final Thoughts
 
