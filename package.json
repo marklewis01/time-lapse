@@ -35,7 +35,7 @@
     "expo-screen-orientation": "~1.0.0",
     "expo-sensors": "~8.1.0",
     "expo-sqlite": "~8.1.0",
-    "moment": "^2.25.3",
+    "moment": "^2.29.4",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
